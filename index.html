@@ -223,16 +223,19 @@
 
   .btn-add{
     display:inline-flex; align-items:center; gap:7px;
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--text-muted);
-    font-weight:600;
+    background:color-mix(in srgb, var(--accent-vtuber) 14%, var(--surface));
+    border:1px solid color-mix(in srgb, var(--accent-vtuber) 55%, var(--border));
+    color:var(--text);
+    font-weight:700;
     font-size:12.5px;
     padding:9px 15px;
     border-radius:100px;
     white-space:nowrap;
   }
-  .btn-add:hover{ color:var(--text); border-color:var(--surface-3); }
+  .btn-add:hover{
+    background:color-mix(in srgb, var(--accent-vtuber) 24%, var(--surface));
+    border-color:var(--accent-vtuber);
+  }
 
   /* ---------- Layout: feed + workspace ---------- */
   .layout{
@@ -654,6 +657,19 @@
     font-weight:600;
   }
   .btn-secondary:hover{ color:var(--text); border-color:var(--surface-3); }
+  .btn-accent{
+    background:color-mix(in srgb, var(--accent-vtuber) 14%, var(--surface-2));
+    border:1px solid color-mix(in srgb, var(--accent-vtuber) 55%, var(--border));
+    color:var(--text);
+    font-weight:700;
+    padding:9px 15px;
+    border-radius:100px;
+    font-size:13px;
+  }
+  .btn-accent:hover{
+    background:color-mix(in srgb, var(--accent-vtuber) 24%, var(--surface-2));
+    border-color:var(--accent-vtuber);
+  }
   .btn-primary-outline{
     background:transparent;
     border:1px solid var(--accent-game);
@@ -777,7 +793,7 @@
       <label for="f-fetch-url">วางลิงก์ข่าว แล้วดึงข้อมูลอัตโนมัติ (ไม่บังคับ)</label>
       <div style="display:flex; gap:8px;">
         <input type="text" id="f-fetch-url" placeholder="https://...">
-        <button class="btn-secondary" id="btn-fetch-meta" style="white-space:nowrap;">ดึงข้อมูล</button>
+        <button class="btn-accent" id="btn-fetch-meta" style="white-space:nowrap;">ดึงข้อมูล</button>
       </div>
       <p id="fetch-meta-status" style="font-size:11.5px; color:var(--text-faint); margin:6px 0 0; display:none;"></p>
     </div>
@@ -1265,9 +1281,12 @@
     html += '  <div style="display:flex; gap:8px;">';
     html += '    <input type="text" id="img-url-input" placeholder="วางลิงก์รูปที่นี่ (https://...)" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; color:var(--text); font-size:13px;">';
     html += '    <button class="btn-secondary" id="btn-add-img" style="white-space:nowrap;">+ เพิ่มรูป</button>';
+    html += '    <button class="btn-secondary" id="btn-upload-img" style="white-space:nowrap;">📁 อัปโหลด</button>';
+    html += '    <input type="file" id="img-file-input" accept="image/*" multiple style="display:none;">';
     html += '  </div>';
+    html += '  <p style="font-size:10.5px; color:var(--text-faint); margin:6px 0 0; line-height:1.5;">💡 อัปโหลดจากเครื่อง = ไม่ติด CORS แน่นอน แต่ใช้ได้แค่ตอนนี้เท่านั้น (ปิด/รีเฟรชหน้าแล้วหาย ไม่ถูกบันทึกลง Sheet) เหมาะกับตอนที่รูปจากลิงก์ฝังไม่ได้</p>';
     if (!it.images || it.images.length === 0){
-      html += '  <p style="font-size:11.5px; color:var(--text-faint); margin:8px 0 0;">ยังไม่มีรูป — เปิดลิงก์ข่าวต้นทางด้านบน คัดลอก URL รูปที่ต้องการมาวางในช่องด้านบนได้เลย</p>';
+      html += '  <p style="font-size:11.5px; color:var(--text-faint); margin:8px 0 0;">ยังไม่มีรูป — เปิดลิงก์ข่าวต้นทางด้านบน คัดลอก URL รูปที่ต้องการมาวางในช่องด้านบนได้เลย หรืออัปโหลดจากเครื่องก็ได้</p>';
     } else {
       const maxSlots = parseInt(selectedLayout, 10);
       html += '  <p style="font-size:11.5px; color:var(--text-faint); margin:8px 0 0;">เลือกแล้ว ' + selectedImageUrls.length + '/' + maxSlots + ' ช่อง — คลิกรูปที่เลือกแล้วซ้ำเพื่อเอาออก</p>';
@@ -1397,10 +1416,11 @@
           e.stopPropagation();
           const idx = parseInt(btn.dataset.remove, 10);
           const removedUrl = (it.images || [])[idx];
+          if (removedUrl && removedUrl.startsWith('blob:')) URL.revokeObjectURL(removedUrl);
           it.images = (it.images || []).filter(function(_, i){ return i !== idx; });
           selectedImageUrls = selectedImageUrls.filter(function(u){ return u !== removedUrl; });
           renderWorkspace();
-          postToSheet({ action:'update', id: it.id, images: it.images });
+          syncImagesToSheet(it);
         });
       });
     }
@@ -1415,11 +1435,29 @@
         const max = parseInt(selectedLayout, 10);
         if (selectedImageUrls.length < max) selectedImageUrls.push(val);
         renderWorkspace();
-        postToSheet({ action:'update', id: it.id, images: it.images });
+        syncImagesToSheet(it);
       };
       addImgBtn.addEventListener('click', doAdd);
       imgUrlInput.addEventListener('keydown', function(e){
         if (e.key === 'Enter'){ e.preventDefault(); doAdd(); }
+      });
+    }
+
+    var uploadBtn = document.getElementById('btn-upload-img');
+    var fileInput = document.getElementById('img-file-input');
+    if (uploadBtn && fileInput){
+      uploadBtn.addEventListener('click', function(){ fileInput.click(); });
+      fileInput.addEventListener('change', function(e){
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+        const max = parseInt(selectedLayout, 10);
+        files.forEach(function(file){
+          const blobUrl = URL.createObjectURL(file);
+          it.images = (it.images || []).concat([blobUrl]);
+          if (selectedImageUrls.length < max) selectedImageUrls.push(blobUrl);
+        });
+        fileInput.value = ''; // เคลียร์ค่า เผื่ออัปโหลดไฟล์เดิมซ้ำได้อีก
+        renderWorkspace(); // ไม่ sync ไป Sheet เพราะเป็น blob URL ใช้ได้แค่เซสชันนี้
       });
     }
 
@@ -1818,6 +1856,13 @@
       }
     }
     return { title: title, summary: rest };
+  }
+
+  function syncImagesToSheet(it){
+    // กรอง blob: URL (รูปที่อัปโหลดจากเครื่อง ใช้ได้แค่เซสชันนี้) ออกก่อน
+    // sync เสมอ เพราะ URL แบบนี้จะใช้งานไม่ได้อีกแล้วถ้าเปิดหน้าใหม่/เครื่องอื่น
+    const persistable = (it.images || []).filter(function(u){ return !u.startsWith('blob:'); });
+    postToSheet({ action:'update', id: it.id, images: persistable });
   }
 
   /* ---------- add modal ---------- */
