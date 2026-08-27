@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ani Network — Content Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#100E17;
+    --surface:#1B1826;
+    --surface-2:#241F33;
+    --surface-3:#2C2640;
+    --border:#332C49;
+    --border-soft:#241F33;
+    --text:#F2F0F7;
+    --text-muted:#948FAA;
+    --text-faint:#615C77;
+
+    --accent-anime:#FF5E8A;
+    --accent-game:#3FD9C7;
+    --accent-vtuber:#B18CFF;
+    --accent-comic:#FFC24B;
+    --accent-live:#FF3B5C;
+
+    --radius:14px;
+    --radius-sm:9px;
+
+    --font-display:'Bebas Neue', 'Noto Sans Thai', sans-serif;
+    --font-body:'Inter', 'Noto Sans Thai', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 1200px 600px at 15% -10%, rgba(177,140,255,0.14), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 100% 0%, rgba(63,217,199,0.10), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+  input,select,textarea{ font-family:inherit; }
+
+  :focus-visible{
+    outline:2px solid var(--accent-vtuber);
+    outline-offset:2px;
+    border-radius:4px;
+  }
+
+  /* ---------- Header / Masthead ---------- */
+  header.masthead{
+    padding:28px clamp(16px,4vw,40px) 0;
+    max-width:1600px;
+    margin:0 auto;
+  }
+  .masthead-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .wordmark{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+  }
+  .wordmark h1{
+    font-family:var(--font-display);
+    font-size:clamp(38px,6vw,54px);
+    letter-spacing:0.03em;
+    margin:0;
+    line-height:0.9;
+    background:linear-gradient(120deg, #FF5E8A 0%, #B18CFF 55%, #3FD9C7 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .wordmark .tag{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    border:1px solid var(--border);
+    padding:4px 9px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .masthead-sub{
+    font-size:13.5px;
+    color:var(--text-muted);
+    margin-top:4px;
+  }
+
+  .stat-strip{
+    display:flex;
+    gap:22px;
+    font-family:var(--font-mono);
+  }
+  .stat-strip .stat{ text-align:right; }
+  .stat-strip .stat .num{
+    font-size:22px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1;
+  }
+  .stat-strip .stat .lbl{
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin-top:3px;
+  }
+
+  /* ---------- Sync banner ---------- */
+  .sync-banner{
+    max-width:1600px;
+    margin:14px auto 0;
+    padding:0 clamp(16px,4vw,40px);
+  }
+  .sync-banner .inner{
+    display:flex; align-items:center; gap:9px;
+    font-size:12.5px;
+    padding:9px 14px;
+    border-radius:100px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-muted);
+  }
+  .sync-banner.error .inner{ border-color:var(--accent-live); color:var(--accent-live); }
+  .sync-banner.ok .inner{ border-color:var(--accent-game); color:var(--accent-game); }
+  .sync-banner .spin{
+    width:11px; height:11px; border-radius:50%;
+    border:2px solid currentColor; border-top-color:transparent;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    max-width:1600px;
+    margin:20px auto 0;
+    padding:0 clamp(16px,4vw,40px);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .search-box{
+    position:relative;
+    flex:1;
+    min-width:200px;
+    max-width:320px;
+  }
+  .search-box svg{
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-faint);
+  }
+  .search-box input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:100px;
+    padding:9px 14px 9px 34px;
+    color:var(--text);
+    font-size:13.5px;
+  }
+  .search-box input::placeholder{ color:var(--text-faint); }
+
+  .chip-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-size:12.5px;
+    font-weight:500;
+    padding:7px 13px;
+    border-radius:100px;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .chip .dot-cat{ width:7px; height:7px; border-radius:50%; }
+  .chip[aria-pressed="true"]{
+    color:var(--text);
+    border-color:var(--chip-color, var(--border));
+    background:color-mix(in srgb, var(--chip-color, var(--surface)) 16%, var(--surface));
+  }
+  .chip:hover{ color:var(--text); }
+
+  .status-seg{
+    display:flex;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:100px;
+    padding:3px;
+    gap:2px;
+  }
+  .status-seg button{
+    background:transparent;
+    border:none;
+    color:var(--text-muted);
+    font-size:12px;
+    font-weight:500;
+    padding:6px 12px;
+    border-radius:100px;
+  }
+  .status-seg button[aria-pressed="true"]{
+    background:var(--surface-3);
+    color:var(--text);
+  }
+
+  .spacer{ flex:1; }
+
+  .btn-add{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-weight:600;
+    font-size:12.5px;
+    padding:9px 15px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .btn-add:hover{ color:var(--text); border-color:var(--surface-3); }
+
+  /* ---------- Layout: feed + workspace ---------- */
+  .layout{
+    max-width:1600px;
+    margin:22px auto 60px;
+    padding:0 clamp(16px,4vw,40px);
+    display:grid;
+    grid-template-columns:minmax(400px, 560px) 1fr;
+    gap:20px;
+    align-items:start;
+  }
+  @media (max-width:920px){
+    .layout{ grid-template-columns:1fr; }
+  }
+
+  .feed-panel{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-height:calc(100vh - 240px);
+    overflow-y:auto;
+    padding-right:4px;
+  }
+  .feed-panel::-webkit-scrollbar{ width:7px; }
+  .feed-panel::-webkit-scrollbar-thumb{ background:var(--surface-3); border-radius:100px; }
+
+  .empty-hint{
+    font-size:12.5px;
+    color:var(--text-faint);
+    text-align:center;
+    padding:30px 12px;
+    border:1px dashed var(--border);
+    border-radius:var(--radius-sm);
+  }
+
+  /* ---------- News card (feed) ---------- */
+  .news-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 15px 12px;
+    cursor:pointer;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .news-card:hover{ border-color:var(--surface-3); }
+  .news-card.selected{
+    border-color:var(--accent-vtuber);
+    background:color-mix(in srgb, var(--accent-vtuber) 8%, var(--surface));
+  }
+  .news-card.drafted{ opacity:0.72; }
+
+  .card-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .cat-badge{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:3px 8px 3px 6px;
+    border-radius:100px;
+  }
+  .cat-badge .dot-cat{ width:6px; height:6px; border-radius:50%; }
+
+  .status-pill{
+    font-family:var(--font-mono);
+    font-size:9.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+  }
+
+  .card-title{
+    font-size:13.5px;
+    font-weight:600;
+    line-height:1.4;
+    margin:0 0 5px;
+  }
+  .card-summary{
+    font-size:12px;
+    color:var(--text-muted);
+    line-height:1.5;
+    margin:0 0 10px;
+  }
+  .news-card .card-summary{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .card-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    color:var(--text-faint);
+    border-top:1px solid var(--border-soft);
+    padding-top:8px;
+  }
+  .card-meta .src{ color:var(--text-muted); }
+  .card-meta .src-link{
+    color:var(--accent-vtuber);
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:3px;
+  }
+  .card-meta .src-link:hover{ text-decoration:underline; }
+
+  .icon-btn{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    width:24px; height:24px;
+    border-radius:7px;
+    display:inline-flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  .icon-btn:hover{ color:var(--accent-live); border-color:var(--accent-live); }
+
+  /* ---------- Workspace panel ---------- */
+  .workspace{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px;
+    min-height:400px;
+  }
+
+  .ws-empty{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    min-height:400px;
+    color:var(--text-faint);
+  }
+  .ws-empty svg{ margin-bottom:14px; opacity:0.5; }
+  .ws-empty p{ font-size:13.5px; max-width:280px; line-height:1.6; }
+
+  .ws-selected-card{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    margin-bottom:20px;
+  }
+  .ws-selected-card .txt{ flex:1; }
+  .ws-selected-card .card-title{ font-size:15px; margin-bottom:4px; }
+  .ws-selected-card .card-summary{ margin-bottom:0; }
+  .link-btn{
+    background:transparent;
+    border:none;
+    color:var(--accent-vtuber);
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+    padding:4px 0;
+  }
+  .link-btn:hover{ text-decoration:underline; }
+
+  .tone-row{
+    display:flex; gap:8px; flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+  .tone-chip{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-size:12px;
+    font-weight:500;
+    padding:7px 13px;
+    border-radius:100px;
+  }
+  .tone-chip:hover{ color:var(--text); border-color:var(--surface-3); }
+  .tone-chip.active{
+    color:#100E17;
+    background:linear-gradient(120deg, var(--accent-anime), var(--accent-vtuber));
+    border-color:transparent;
+    font-weight:700;
+  }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--text-muted);
+    margin-bottom:6px;
+    letter-spacing:0.02em;
+  }
+  .field textarea, .field input{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:10px 12px;
+    color:var(--text);
+    font-size:13px;
+    line-height:1.6;
+    resize:vertical;
+  }
+  .field textarea.style-input{ min-height:64px; }
+  .field textarea.article-input{ min-height:180px; }
+
+  .btn-generate{
+    display:inline-flex; align-items:center; gap:8px;
+    background:linear-gradient(120deg, var(--accent-anime), var(--accent-vtuber));
+    color:#100E17;
+    font-weight:700;
+    font-size:13.5px;
+    border:none;
+    padding:11px 20px;
+    border-radius:100px;
+  }
+  .btn-generate:hover{ filter:brightness(1.08); }
+  .btn-generate:disabled{ opacity:0.55; pointer-events:none; }
+  .btn-generate .spin{
+    width:13px; height:13px; border-radius:50%;
+    border:2px solid #100E17; border-top-color:transparent;
+    animation:spin 0.7s linear infinite;
+  }
+
+  .gen-error{
+    margin-top:12px;
+    font-size:12.5px;
+    color:var(--accent-live);
+    background:color-mix(in srgb, var(--accent-live) 10%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent-live) 35%, transparent);
+    border-radius:var(--radius-sm);
+    padding:11px 14px;
+    line-height:1.6;
+  }
+
+  .divider{
+    border:none;
+    border-top:1px solid var(--border-soft);
+    margin:22px 0;
+  }
+
+  .headline-options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .headline-opt{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-align:left;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:11px 13px;
+    font-size:13.5px;
+    line-height:1.5;
+    color:var(--text-muted);
+  }
+  .headline-opt:hover{ border-color:var(--surface-3); }
+  .headline-opt.picked{
+    border-color:var(--accent-comic);
+    background:color-mix(in srgb, var(--accent-comic) 10%, var(--surface-2));
+    color:var(--text);
+  }
+  .headline-opt .radio{
+    width:15px; height:15px; border-radius:50%;
+    border:2px solid var(--border);
+    flex:none; margin-top:2px;
+  }
+  .headline-opt.picked .radio{
+    border-color:var(--accent-comic);
+    background:radial-gradient(circle, var(--accent-comic) 0 40%, transparent 42%);
+  }
+
+  .hook-box{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:14px 16px;
+    font-size:14px;
+    line-height:1.7;
+    font-style:italic;
+    color:var(--text);
+  }
+
+  .field-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .field-head label{ margin-bottom:0; }
+  .copy-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-faint);
+    font-size:10.5px;
+    padding:3px 9px;
+    border-radius:100px;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .copy-btn:hover{ color:var(--text); border-color:var(--surface-3); }
+
+  .ws-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .btn-secondary{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    padding:10px 16px;
+    border-radius:100px;
+    font-size:13px;
+    font-weight:600;
+  }
+  .btn-secondary:hover{ color:var(--text); border-color:var(--surface-3); }
+  .btn-primary-outline{
+    background:transparent;
+    border:1px solid var(--accent-game);
+    color:var(--accent-game);
+    padding:10px 16px;
+    border-radius:100px;
+    font-size:13px;
+    font-weight:700;
+  }
+  .btn-primary-outline:hover{ background:color-mix(in srgb, var(--accent-game) 12%, transparent); }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(8,7,13,0.72);
+    backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    width:100%; max-width:440px;
+    padding:22px;
+  }
+  .modal h2{
+    font-family:var(--font-display);
+    font-size:24px;
+    letter-spacing:0.02em;
+    margin:0 0 16px;
+  }
+  .modal .field select{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:9px 11px;
+    color:var(--text);
+    font-size:13.5px;
+  }
+  .modal-actions{
+    display:flex; gap:8px; justify-content:flex-end; margin-top:18px;
+  }
+  .btn-primary{
+    background:linear-gradient(120deg, var(--accent-anime), var(--accent-vtuber));
+    border:none;
+    color:#100E17;
+    font-weight:700;
+    padding:9px 17px;
+    border-radius:100px;
+    font-size:13px;
+  }
+
+  footer.note{
+    max-width:1600px;
+    margin:0 auto 40px;
+    padding:0 clamp(16px,4vw,40px);
+    font-size:11.5px;
+    color:var(--text-faint);
+    font-family:var(--font-mono);
+  }
+
+  @media (max-width:640px){
+    .stat-strip{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-row">
+    <div>
+      <div class="wordmark">
+        <h1>ANI NETWORK</h1>
+        <span class="tag">Content Desk</span>
+      </div>
+      <p class="masthead-sub">แสดงข่าว → เลือกข่าว → ให้ AI เขียนบทความในสไตล์เพจ — ข้อมูลตัวอย่างเพื่อสาธิตการทำงาน</p>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><div class="num" id="stat-total">–</div><div class="lbl">ข่าวทั้งหมด</div></div>
+      <div class="stat"><div class="num" id="stat-drafted">–</div><div class="lbl">เขียนแล้ว</div></div>
+      <div class="stat"><div class="num" id="stat-posted">–</div><div class="lbl">โพสต์แล้ว</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="sync-banner" id="sync-banner" hidden></div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="ค้นหาข่าว...">
+  </div>
+  <div class="chip-row" id="chip-row"><!-- filled by JS --></div>
+  <div class="status-seg" id="status-seg"><!-- filled by JS --></div>
+  <div class="spacer"></div>
+  <button class="btn-add" id="btn-open-add">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    เพิ่มข่าว
+  </button>
+</div>
+
+<main class="layout">
+  <section class="feed-panel" id="feed-panel"><!-- filled by JS --></section>
+  <section class="workspace" id="workspace"><!-- filled by JS --></section>
+</main>
+
+<footer class="note" id="footer-note">
+  ⚠ ข้อมูลในหน้านี้เป็นข้อมูลจำลอง (mock data) สำหรับทดสอบหน้าตาและการใช้งาน — ยังไม่ได้เชื่อมต่อกับ Google Sheet
+</footer>
+
+<!-- Add News Modal -->
+<div class="modal-overlay" id="modal-overlay" hidden>
+  <div class="modal">
+    <h2>เพิ่มข่าวใหม่</h2>
+    <div class="field">
+      <label for="f-title">หัวข้อข่าว</label>
+      <input type="text" id="f-title" placeholder="เช่น ประกาศซีซั่นใหม่ของ...">
+    </div>
+    <div class="field">
+      <label for="f-category">หมวดหมู่</label>
+      <select id="f-category">
+        <option value="anime">Anime</option>
+        <option value="game">Game</option>
+        <option value="vtuber">VTuber</option>
+        <option value="comic">Comic</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-summary">สรุปสั้นๆ</label>
+      <textarea id="f-summary" placeholder="สรุป 1-2 บรรทัด"></textarea>
+    </div>
+    <div class="field">
+      <label for="f-source">แหล่งที่มา</label>
+      <input type="text" id="f-source" placeholder="เช่น Anime News Network">
+    </div>
+    <div class="field">
+      <label for="f-url">ลิงก์ข่าวต้นทาง (ถ้ามี)</label>
+      <input type="text" id="f-url" placeholder="https://...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btn-cancel">ยกเลิก</button>
+      <button class="btn-primary" id="btn-save">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  /* ============================================================
+     ตั้งค่าการเชื่อมต่อ Google Sheet + AI
+     -----------------------------------------------------------
+     1. ติดตั้ง apps-script-backend.gs ลงใน Google Sheet ของคุณ
+        (ดูขั้นตอนใน setup-guide.md)
+     2. Deploy เป็น Web App แล้วก็อปปี้ URL ที่ได้มาใส่ด้านล่างนี้
+     3. ปุ่ม "ให้ AI เขียนบทความ" ทำงานแบบคัดลอก Prompt ไปวางใน
+        Claude.ai เอง ไม่ต้องมี API key และไม่มีค่าใช้จ่ายเพิ่ม
+     4. ถ้าเว้น SHEET_API_URL ว่างไว้ ระบบจะใช้ข้อมูลจำลองแทน
+        และปุ่มเขียนบทความจะใช้ไม่ได้ (ต้องมี backend เท่านั้น)
+     ============================================================ */
+  const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwioBlv2ncJHZ3AIkS2Va54bvjNDgUVZd4KpTL2VoIwve7azxNiY4Hwev0CuIKsSYjHBg/exec'; // <-- วาง URL ของ Apps Script Web App ตรงนี้
+
+  const CATEGORIES = {
+    anime:  { label:'Anime',  color:'var(--accent-anime)'  },
+    game:   { label:'Game',   color:'var(--accent-game)'   },
+    vtuber: { label:'VTuber', color:'var(--accent-vtuber)' },
+    comic:  { label:'Comic',  color:'var(--accent-comic)'  },
+  };
+
+  const STATUS_LABEL = { new:'ยังไม่เขียน', drafted:'เขียนแล้ว', posted:'โพสต์แล้ว' };
+
+  const STATUS_FILTERS = [
+    { id:'all',     label:'ทั้งหมด' },
+    { id:'new',     label:'ยังไม่เขียน' },
+    { id:'drafted', label:'เขียนแล้ว' },
+    { id:'posted',  label:'โพสต์แล้ว' },
+  ];
+
+  const DEFAULT_STYLE_GUIDE =
+    'น้ำเสียงเป็นกันเอง กวนๆ แบบเพื่อนคุยกัน ใช้ภาษาวัยรุ่นได้ มีมุกตลกแทรกได้บ้าง ' +
+    'ใช้อีโมจิพอประมาณไม่เยอะเกินไป ไม่เป็นทางการจนเกินไป ลงท้ายบทความด้วยประโยคชวนผู้อ่านคอมเมนต์หรือแชร์ความเห็น ' +
+    'หลีกเลี่ยงการสปอยล์เนื้อหาสำคัญเกินความจำเป็น';
+
+  const TONE_PRESETS = [
+    { id:'casual', label:'กวนๆ เป็นกันเอง', text:
+      'น้ำเสียงเป็นกันเอง กวนๆ แบบเพื่อนคุยกัน ใช้ภาษาวัยรุ่นได้ มีมุกตลกแทรกได้บ้าง ' +
+      'ใช้อีโมจิพอประมาณไม่เยอะเกินไป ไม่เป็นทางการจนเกินไป ลงท้ายบทความด้วยประโยคชวนผู้อ่านคอมเมนต์หรือแชร์ความเห็น ' +
+      'หลีกเลี่ยงการสปอยล์เนื้อหาสำคัญเกินความจำเป็น' },
+    { id:'hype', label:'ตื่นเต้น กระตุ้นอยากรู้', text:
+      'น้ำเสียงตื่นเต้น กระตุ้นความอยากรู้อยากเห็นตั้งแต่ประโยคแรก ใช้คำที่ทรงพลังสร้างความรู้สึกเร่งด่วน ' +
+      'เน้นจุดที่น่าตกใจ/น่าประหลาดใจของข่าวเป็นพิเศษ ใช้เครื่องหมายอัศเจรีย์ได้บ้างแต่ไม่มากเกินไป ' +
+      'ลงท้ายด้วยคำถามชวนให้คนอยากรู้เรื่องต่อไป' },
+    { id:'professional', label:'จริงจัง มืออาชีพ', text:
+      'น้ำเสียงจริงจัง เป็นมืออาชีพ ให้ข้อมูลครบถ้วนถูกต้องตามข้อเท็จจริง ไม่ใช้มุกตลกหรือคำแสลง ' +
+      'เรียบเรียงตามลำดับความสำคัญของข้อมูล เหมาะกับข่าวที่มีความสำคัญหรือละเอียดอ่อน ไม่ใช้อีโมจิ' },
+    { id:'warm', label:'อบอุ่น เป็นเพื่อน', text:
+      'น้ำเสียงอบอุ่น เหมือนเพื่อนสนิทเล่าเรื่องให้ฟัง ใส่ใจความรู้สึกผู้อ่าน ใช้ภาษาน่ารักเป็นกันเอง ' +
+      'ไม่กดดันหรือเร่งรีบ อาจแทรกความเห็นส่วนตัวเบาๆ ได้ ลงท้ายด้วยข้อความให้กำลังใจหรือชวนคุยแบบอบอุ่น' },
+    { id:'snarky', label:'ประชดประชัน ขำขัน', text:
+      'น้ำเสียงประชดประชันแบบขำขัน มีมุมมองส่วนตัวแทรกได้ชัดเจน กล้าแซวหรือติงเรื่องที่ดูแปลกๆ ในข่าวอย่างมีชั้นเชิง ' +
+      'ไม่หยาบคายหรือทำร้ายใคร แค่มองโลกในแง่ขำๆ ใช้ภาษาแบบกันเองสุดๆ' },
+    { id:'breaking', label:'ข่าวด่วน กระชับ', text:
+      'น้ำเสียงข่าวด่วน กระชับ ตรงประเด็น ขึ้นต้นด้วยข้อเท็จจริงสำคัญที่สุดก่อนเสมอ ไม่อ้อมค้อม ' +
+      'ประโยคสั้น อ่านง่าย เหมาะกับคนที่มีเวลาน้อย ไม่ใส่ความเห็นส่วนตัวหรือมุกตลก' },
+  ];
+
+  function loadInitialItems(){
+    const raw = [
+      { category:'anime', status:'new', mins:14,
+        title:'[ตัวอย่าง] อนิเมะเรื่องดังประกาศซีซั่น 2 พร้อมทีเซอร์แรก',
+        summary:'สตูดิโอยืนยันวันฉายอย่างเป็นทางการ พร้อมทีมงานชุดเดิมกลับมาทำต่อ',
+        source:'Anime News Network' },
+      { category:'game', status:'new', mins:22,
+        title:'[ตัวอย่าง] เกม RPG ญี่ปุ่นเปิดให้พรีออเดอร์บน PC แล้ววันนี้',
+        summary:'มาพร้อมโหมดใหม่และของแถมเฉพาะรอบพรีออเดอร์ช่วงแรก',
+        source:'AUTOMATON WEST' },
+      { category:'vtuber', status:'new', mins:35,
+        title:'[ตัวอย่าง] VTuber รุ่นใหม่จากค่ายใหญ่เตรียมเดบิวต์สัปดาห์หน้า',
+        summary:'เผยภาพตัวละครแรกพร้อมทีเซอร์เสียงสั้นๆ ผ่านทางบัญชีทางการ',
+        source:'hololive production' },
+      { category:'comic', status:'new', mins:51,
+        title:'[ตัวอย่าง] มังงะชื่อดังประกาศจบฉบับต้นเรื่องภายในปีนี้',
+        summary:'นักเขียนโพสต์ข้อความขอบคุณแฟนๆ พร้อมใบ้ตอนจบใหญ่',
+        source:'Anime Corner' },
+      { category:'game', status:'new', mins:70,
+        title:'[ตัวอย่าง] อัปเดตใหญ่เกมมือถือเพิ่มตัวละครคอลแลบพิเศษ',
+        summary:'อีเวนต์คอลแลบมาพร้อมสตอรี่ใหม่และของแจกฟรีระหว่างช่วงกิจกรรม',
+        source:'udn遊戲角落' },
+      { category:'vtuber', status:'new', mins:95,
+        title:'[ตัวอย่าง] สองค่าย VTuber ใหญ่จับมือจัดอีเวนต์ร่วมปลายปี',
+        summary:'เตรียมเปิดขายบัตรล่วงหน้าและสตรีมสดพร้อมกันหลายช่องทาง',
+        source:'NIJISANJI EN' },
+      { category:'anime', status:'new', mins:120,
+        title:'[ตัวอย่าง] อนิเมะฟอร์มยักษ์เผยธีมซองเปิด-ปิดใหม่',
+        summary:'ศิลปินชื่อดังรับหน้าที่แต่งเพลงประกอบ พร้อมปล่อยฟังตัวอย่างแล้ว',
+        source:'Crunchyroll' },
+      { category:'vtuber', status:'drafted', mins:160,
+        title:'[ตัวอย่าง] VTuber อิสระทำยอดผู้ชมพร้อมกันทะลุสถิติใหม่',
+        summary:'สตรีมพิเศษฉลองครบรอบช่องดึงดูดผู้ชมจากหลายประเทศ',
+        source:'VTuber NewsDrop' },
+      { category:'game', status:'drafted', mins:200,
+        title:'[ตัวอย่าง] ผู้พัฒนาเกมอินดี้ญี่ปุ่นเผยภาพแรกของโปรเจกต์ใหม่',
+        summary:'ยังไม่เผยชื่อเกม แต่ยืนยันแนวไขปริศนาผสมโลกเปิด',
+        source:'AUTOMATON WEST' },
+      { category:'anime', status:'posted', mins:420,
+        title:'[ตัวอย่าง] สรุปงานอีเวนต์อนิเมะสุดสัปดาห์ที่ผ่านมา',
+        summary:'รวมไฮไลต์และของที่ระลึกเด่นๆ จากบูธต่างๆ ในงาน',
+        source:'Anime Corner' },
+      { category:'game', status:'posted', mins:500,
+        title:'[ตัวอย่าง] รีวิวสั้นเกมใหม่ที่เพิ่งวางจำหน่ายสัปดาห์นี้',
+        summary:'จุดเด่นเรื่องกราฟิกและระบบต่อสู้ที่ลื่นไหลกว่าภาคก่อน',
+        source:'udn遊戲角落' },
+    ];
+    return raw.map(function(it){
+      it.id = id();
+      it.timestamp = new Date(Date.now() - it.mins * 60000).toISOString();
+      delete it.mins;
+      it.article = null;
+      return it;
+    });
+  }
+
+  /* ---------- เชื่อมต่อ Google Sheet + AI ผ่าน Apps Script ---------- */
+  async function fetchItemsFromSheet(){
+    const res = await fetch(SHEET_API_URL);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'โหลดข้อมูลไม่สำเร็จ');
+    return data.items.map(function(row){
+      return {
+        id: String(row.id),
+        category: row.category,
+        status: row.status || 'new',
+        title: row.title,
+        summary: row.summary,
+        source: row.source,
+        url: row.url || '',
+        timestamp: row.timestamp,
+        article: null,
+      };
+    });
+  }
+
+  async function postToSheet(payload){
+    if (!SHEET_API_URL) return null;
+    try {
+      const res = await fetch(SHEET_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      });
+      return await res.json();
+    } catch (err) {
+      showBanner('error', 'เชื่อมต่อ backend ไม่สำเร็จ: ' + err.message);
+      return null;
+    }
+  }
+
+  /* ---------- สร้าง prompt สำหรับคัดลอกไปวางใน Claude.ai ---------- */
+  function buildPrompt(newsItem, styleGuide){
+    return (
+      'กรุณาช่วยเขียนคอนเทนต์สำหรับเพจข่าว Ani Network ให้ตรงตามรูปแบบด้านล่างนี้เป๊ะๆ\n\n' +
+      'สไตล์การเขียนของเพจ:\n' + styleGuide + '\n\n' +
+      'ข่าวที่จะเขียน:\n' +
+      'หมวดหมู่: ' + catMeta(newsItem.category).label + '\n' +
+      'หัวข้อ: ' + newsItem.title + '\n' +
+      'สรุป: ' + newsItem.summary + '\n' +
+      'แหล่งที่มา: ' + newsItem.source + '\n\n' +
+      'กรุณาตอบกลับตามรูปแบบนี้เป๊ะๆ (ห้ามมีข้อความอื่นนอกเหนือจากนี้ ห้ามใช้ตัวหนาหรือมาร์กดาวน์):\n\n' +
+      'HEADLINE 1: [หัวข้อทางเลือกที่ 1 ไม่เกิน 100 ตัวอักษร]\n' +
+      'HEADLINE 2: [หัวข้อทางเลือกที่ 2]\n' +
+      'HEADLINE 3: [หัวข้อทางเลือกที่ 3]\n' +
+      'HOOK: [ประโยคเปิดบทความ 1-2 ประโยคที่ทำให้คนอยากอ่านต่อ]\n' +
+      'ARTICLE: [เนื้อหาบทความเต็ม ความยาวประมาณ 150-250 คำ ในสไตล์เพจตามที่กำหนด]'
+    );
+  }
+
+  /* ---------- แยกข้อมูลจากคำตอบที่วางกลับมาจาก Claude.ai ---------- */
+  function parsePastedResponse(text){
+    function grab(label, nextLabels){
+      const pattern = new RegExp(label + '\\s*:?\\s*([\\s\\S]*?)(?=' + nextLabels.join('|') + '|$)', 'i');
+      const m = text.match(pattern);
+      return m ? m[1].trim() : '';
+    }
+    const h1 = grab('HEADLINE\\s*1', ['HEADLINE\\s*2']);
+    const h2 = grab('HEADLINE\\s*2', ['HEADLINE\\s*3']);
+    const h3 = grab('HEADLINE\\s*3', ['HOOK']);
+    const hook = grab('HOOK', ['ARTICLE']);
+    const article = grab('ARTICLE', ['$^']); // ไปจนจบข้อความ
+
+    const headlines = [h1, h2, h3].filter(Boolean);
+
+    if (headlines.length === 0 && !hook && !article){
+      // แยกรูปแบบไม่สำเร็จ — เก็บข้อความทั้งหมดไว้ในช่องบทความแทน ไม่ให้ข้อมูลหาย
+      return { headlines:['(กรุณาระบุหัวข้อเอง)'], hook:'(กรุณาระบุ hook เอง)', article:text.trim() };
+    }
+
+    return {
+      headlines: headlines.length ? headlines : ['(กรุณาระบุหัวข้อเอง)'],
+      hook: hook || '(กรุณาระบุ hook เอง)',
+      article: article || text.trim(),
+    };
+  }
+
+  function showBanner(type, text){
+    const el = document.getElementById('sync-banner');
+    el.hidden = false;
+    el.className = 'sync-banner' + (type ? ' ' + type : '');
+    el.innerHTML = '<div class="inner">' + (type === 'loading' ? '<span class="spin"></span>' : '') + text + '</div>';
+    if (type === 'ok'){ setTimeout(function(){ el.hidden = true; }, 2500); }
+  }
+
+  let counter = 0;
+  function id(){ return 'itm-' + (++counter); }
+
+  let items = [];
+  let activeCategory = 'all';
+  let activeStatusFilter = 'all';
+  let searchTerm = '';
+  let selectedId = null;
+  let styleGuideText = DEFAULT_STYLE_GUIDE;
+  let activeTone = 'casual';
+  let genResult = null;   // { headlines, hook, article }
+  let pickedHeadlineIdx = 0;
+  let pasteAreaOpen = false;
+  let pastedText = '';
+  let parseError = null;
+
+  async function initItems(){
+    const footer = document.getElementById('footer-note');
+    if (!SHEET_API_URL){
+      items = loadInitialItems();
+      return;
+    }
+    showBanner('loading', 'กำลังโหลดข้อมูลจาก Google Sheet...');
+    try {
+      items = await fetchItemsFromSheet();
+      document.getElementById('sync-banner').hidden = true;
+      footer.textContent = '🟢 เชื่อมต่อกับ Google Sheet แล้ว — การเปลี่ยนแปลงทั้งหมดจะถูกบันทึกลงชีตจริง';
+    } catch (err) {
+      items = loadInitialItems();
+      showBanner('error', 'เชื่อมต่อ Google Sheet ไม่สำเร็จ กำลังแสดงข้อมูลจำลองแทน');
+      footer.textContent = '⚠ เชื่อมต่อ Google Sheet ไม่สำเร็จ (' + err.message + ') — กำลังแสดงข้อมูลตัวอย่างชั่วคราว';
+    }
+  }
+
+  function minsSince(ts){ return Math.max(0, Math.floor((Date.now() - new Date(ts).getTime()) / 60000)); }
+  function timeAgo(ts){
+    const mins = minsSince(ts);
+    if (mins < 1) return 'เมื่อสักครู่';
+    if (mins < 60) return mins + ' นาทีที่แล้ว';
+    const h = Math.floor(mins / 60);
+    if (h < 24) return h + ' ชม.ที่แล้ว';
+    return Math.floor(h / 24) + ' วันที่แล้ว';
+  }
+  function catMeta(catId){ return CATEGORIES[catId] || { label:catId, color:'var(--text-muted)' }; }
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : s;
+    return d.innerHTML;
+  }
+
+  function filteredItems(){
+    return items
+      .filter(function(it){
+        if (activeCategory !== 'all' && it.category !== activeCategory) return false;
+        if (activeStatusFilter !== 'all' && it.status !== activeStatusFilter) return false;
+        if (searchTerm){
+          const hay = (it.title + ' ' + it.summary + ' ' + it.source).toLowerCase();
+          if (!hay.includes(searchTerm)) return false;
+        }
+        return true;
+      })
+      .sort(function(a,b){ return minsSince(a.timestamp) - minsSince(b.timestamp); });
+  }
+
+  /* ---------- render: chips + status seg ---------- */
+  function renderChips(){
+    const row = document.getElementById('chip-row');
+    row.innerHTML = '';
+    row.appendChild(makeChip('all', 'ทั้งหมด', null));
+    Object.entries(CATEGORIES).forEach(function(pair){
+      row.appendChild(makeChip(pair[0], pair[1].label, pair[1].color));
+    });
+
+    const seg = document.getElementById('status-seg');
+    seg.innerHTML = '';
+    STATUS_FILTERS.forEach(function(sf){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = sf.label;
+      btn.setAttribute('aria-pressed', activeStatusFilter === sf.id ? 'true' : 'false');
+      btn.addEventListener('click', function(){ activeStatusFilter = sf.id; renderAll(); });
+      seg.appendChild(btn);
+    });
+  }
+
+  function makeChip(catId, label, color){
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', activeCategory === catId ? 'true' : 'false');
+    if (color) btn.style.setProperty('--chip-color', color);
+    btn.innerHTML = (color ? '<span class="dot-cat" style="background:' + color + '"></span>' : '') + label;
+    btn.addEventListener('click', function(){ activeCategory = catId; renderAll(); });
+    return btn;
+  }
+
+  /* ---------- render: stats ---------- */
+  function renderStats(){
+    document.getElementById('stat-total').textContent = items.length;
+    document.getElementById('stat-drafted').textContent = items.filter(function(it){ return it.status === 'drafted'; }).length;
+    document.getElementById('stat-posted').textContent = items.filter(function(it){ return it.status === 'posted'; }).length;
+  }
+
+  /* ---------- render: feed ---------- */
+  function renderFeed(){
+    const panel = document.getElementById('feed-panel');
+    panel.innerHTML = '';
+    const visible = filteredItems();
+
+    if (visible.length === 0){
+      const hint = document.createElement('div');
+      hint.className = 'empty-hint';
+      hint.textContent = 'ไม่พบข่าวที่ตรงกับเงื่อนไข';
+      panel.appendChild(hint);
+      return;
+    }
+
+    visible.forEach(function(it){ panel.appendChild(renderNewsCard(it)); });
+  }
+
+  function renderNewsCard(it){
+    const meta = catMeta(it.category);
+    const card = document.createElement('div');
+    card.className = 'news-card' + (it.id === selectedId ? ' selected' : '') + (it.status === 'drafted' || it.status === 'posted' ? ' drafted' : '');
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+
+    const srcHtml = it.url
+      ? '<a class="src-link" href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener">' + escapeHtml(it.source) + ' ↗</a>'
+      : '<span class="src">' + escapeHtml(it.source) + '</span>';
+
+    card.innerHTML =
+      '<div class="card-top">' +
+        '<span class="cat-badge" style="color:' + meta.color + '; background:color-mix(in srgb, ' + meta.color + ' 16%, transparent); border:1px solid color-mix(in srgb, ' + meta.color + ' 35%, transparent);">' +
+          '<span class="dot-cat" style="background:' + meta.color + '"></span>' + meta.label +
+        '</span>' +
+        '<span class="status-pill">' + STATUS_LABEL[it.status] + '</span>' +
+      '</div>' +
+      '<p class="card-title">' + escapeHtml(it.title) + '</p>' +
+      '<p class="card-summary">' + escapeHtml(it.summary) + '</p>' +
+      '<div class="card-meta">' +
+        srcHtml +
+        '<span>' + timeAgo(it.timestamp) + '</span>' +
+      '</div>';
+
+    card.addEventListener('click', function(){ selectItem(it.id); });
+    card.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectItem(it.id); }
+    });
+
+    return card;
+  }
+
+  function selectItem(itemId){
+    selectedId = itemId;
+    genResult = null;
+    pasteAreaOpen = false;
+    pastedText = '';
+    parseError = null;
+    pickedHeadlineIdx = 0;
+    renderAll();
+    if (window.innerWidth < 920){
+      document.getElementById('workspace').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  }
+
+  /* ---------- render: workspace ---------- */
+  function renderWorkspace(){
+    const ws = document.getElementById('workspace');
+    const it = items.find(function(x){ return x.id === selectedId; });
+
+    if (!it){
+      ws.innerHTML =
+        '<div class="ws-empty">' +
+          '<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+          '<p>เลือกข่าวจากรายการด้านซ้ายเพื่อเริ่มเขียนบทความ AI จะช่วยสร้าง Headline, Hook และเนื้อหาให้ในสไตล์เพจของคุณ</p>' +
+        '</div>';
+      return;
+    }
+
+    const meta = catMeta(it.category);
+    let html = '';
+
+    html += '<div class="ws-selected-card">';
+    html += '  <div class="txt">';
+    html += '    <span class="cat-badge" style="color:' + meta.color + '; background:color-mix(in srgb, ' + meta.color + ' 16%, transparent); border:1px solid color-mix(in srgb, ' + meta.color + ' 35%, transparent); margin-bottom:8px;">';
+    html += '      <span class="dot-cat" style="background:' + meta.color + '"></span>' + meta.label;
+    html += '    </span>';
+    html += '    <p class="card-title">' + escapeHtml(it.title) + '</p>';
+    html += '    <p class="card-summary">' + escapeHtml(it.summary) + ' — ' + (it.url ? '<a class="src-link" href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener">' + escapeHtml(it.source) + ' ↗</a>' : '<span class="src">' + escapeHtml(it.source) + '</span>') + '</p>';
+    html += '  </div>';
+    html += '  <button class="link-btn" id="btn-deselect">เปลี่ยนข่าว</button>';
+    html += '</div>';
+
+    html += '<div class="field">';
+    html += '  <label>โทนของบทความ</label>';
+    html += '  <div class="tone-row" id="tone-row">';
+    TONE_PRESETS.forEach(function(t){
+      html += '<button type="button" class="tone-chip' + (activeTone === t.id ? ' active' : '') + '" data-tone="' + t.id + '">' + t.label + '</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    html += '<div class="field">';
+    html += '  <label for="style-guide">สไตล์การเขียนของเพจ (ปรับแก้เพิ่มเติมได้)</label>';
+    html += '  <textarea class="style-input" id="style-guide">' + escapeHtml(styleGuideText) + '</textarea>';
+    html += '</div>';
+
+    html += '<button class="btn-generate" id="btn-copy-prompt">📋 คัดลอก Prompt ไปวางใน Claude.ai</button>';
+    html += '<p style="font-size:11.5px; color:var(--text-faint); margin:10px 0 0; line-height:1.6;">';
+    html += 'กดปุ่มนี้เพื่อคัดลอกคำสั่งสำเร็จรูป แล้วไปวางในแท็บ Claude.ai ที่เปิดไว้ (ใช้โควตา Pro ปกติ ไม่เสียเงินเพิ่ม) ';
+    html += 'จากนั้นคัดลอกคำตอบที่ได้กลับมาวางในช่องด้านล่าง</p>';
+
+    if (!pasteAreaOpen && !genResult){
+      html += '<button class="btn-secondary" id="btn-open-paste" style="margin-top:14px;">วางคำตอบจาก Claude.ai</button>';
+    }
+
+    if (pasteAreaOpen && !genResult){
+      html += '<div class="field" style="margin-top:16px;">';
+      html += '  <label for="paste-response">วางคำตอบจาก Claude.ai ที่นี่</label>';
+      html += '  <textarea class="article-input" id="paste-response" placeholder="วางข้อความที่ Claude.ai ตอบกลับมาทั้งหมด">' + escapeHtml(pastedText) + '</textarea>';
+      html += '</div>';
+      html += '<button class="btn-generate" id="btn-parse">✅ แยกข้อมูลและแสดงผล</button>';
+    }
+
+    if (parseError){
+      html += '<div class="gen-error">⚠ ' + escapeHtml(parseError) + '</div>';
+    }
+
+    if (genResult){
+      html += '<hr class="divider">';
+
+      html += '<div class="field">';
+      html += '  <label>เลือก Headline</label>';
+      html += '  <div class="headline-options" id="headline-options">';
+      genResult.headlines.forEach(function(h, idx){
+        html += '<button type="button" class="headline-opt' + (idx === pickedHeadlineIdx ? ' picked' : '') + '" data-idx="' + idx + '">';
+        html += '<span class="radio"></span><span>' + escapeHtml(h) + '</span>';
+        html += '</button>';
+      });
+      html += '  </div>';
+      html += '</div>';
+
+      html += '<div class="field">';
+      html += '  <div class="field-head"><label>Hook เปิดเรื่อง</label><button class="copy-btn" id="copy-hook">คัดลอก</button></div>';
+      html += '  <div class="hook-box">' + escapeHtml(genResult.hook) + '</div>';
+      html += '</div>';
+
+      html += '<div class="field">';
+      html += '  <div class="field-head"><label>เนื้อหาบทความ</label><button class="copy-btn" id="copy-article">คัดลอก</button></div>';
+      html += '  <textarea class="article-input" id="article-body">' + escapeHtml(genResult.article) + '</textarea>';
+      html += '</div>';
+
+      html += '<div class="ws-actions">';
+      html += '  <button class="btn-secondary" id="btn-redo">🔄 เริ่มใหม่ (วางคำตอบใหม่)</button>';
+      html += '  <button class="btn-secondary" id="btn-copy-all">📋 คัดลอกทั้งหมด</button>';
+      html += '  <button class="btn-primary-outline" id="btn-mark-drafted">✅ บันทึกสถานะ "เขียนแล้ว"</button>';
+      html += '</div>';
+    }
+
+    ws.innerHTML = html;
+
+    // bind events
+    var deselectBtn = document.getElementById('btn-deselect');
+    if (deselectBtn) deselectBtn.addEventListener('click', function(){ selectedId = null; genResult = null; pasteAreaOpen = false; pastedText = ''; parseError = null; renderAll(); });
+
+    var toneRow = document.getElementById('tone-row');
+    if (toneRow){
+      toneRow.querySelectorAll('.tone-chip').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          const preset = TONE_PRESETS.find(function(t){ return t.id === btn.dataset.tone; });
+          if (!preset) return;
+          activeTone = preset.id;
+          styleGuideText = preset.text;
+          renderWorkspace();
+        });
+      });
+    }
+
+    var styleEl = document.getElementById('style-guide');
+    if (styleEl) styleEl.addEventListener('input', function(e){ styleGuideText = e.target.value; });
+
+    var genBtn = document.getElementById('btn-copy-prompt');
+    if (genBtn) genBtn.addEventListener('click', function(){
+      const prompt = buildPrompt(it, styleGuideText);
+      navigator.clipboard.writeText(prompt).then(function(){
+        showBanner('ok', 'คัดลอก Prompt แล้ว! ไปวางในแท็บ Claude.ai ได้เลย');
+        pasteAreaOpen = true;
+        renderWorkspace();
+      });
+    });
+
+    var openPasteBtn = document.getElementById('btn-open-paste');
+    if (openPasteBtn) openPasteBtn.addEventListener('click', function(){
+      pasteAreaOpen = true;
+      renderWorkspace();
+      var ta = document.getElementById('paste-response');
+      if (ta) ta.focus();
+    });
+
+    var pasteEl = document.getElementById('paste-response');
+    if (pasteEl) pasteEl.addEventListener('input', function(e){ pastedText = e.target.value; });
+
+    var parseBtn = document.getElementById('btn-parse');
+    if (parseBtn) parseBtn.addEventListener('click', function(){
+      if (!pastedText.trim()){
+        parseError = 'กรุณาวางคำตอบจาก Claude.ai ก่อน';
+        renderWorkspace();
+        return;
+      }
+      parseError = null;
+      genResult = parsePastedResponse(pastedText);
+      pickedHeadlineIdx = 0;
+      renderWorkspace();
+    });
+
+    var redoBtn = document.getElementById('btn-redo');
+    if (redoBtn) redoBtn.addEventListener('click', function(){
+      genResult = null;
+      pasteAreaOpen = true;
+      pastedText = '';
+      parseError = null;
+      renderWorkspace();
+    });
+
+    var articleEl = document.getElementById('article-body');
+    if (articleEl) articleEl.addEventListener('input', function(e){ genResult.article = e.target.value; });
+
+    var headlineOptsWrap = document.getElementById('headline-options');
+    if (headlineOptsWrap){
+      headlineOptsWrap.querySelectorAll('.headline-opt').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          pickedHeadlineIdx = parseInt(btn.dataset.idx, 10);
+          renderWorkspace();
+        });
+      });
+    }
+
+    var copyHookBtn = document.getElementById('copy-hook');
+    if (copyHookBtn) copyHookBtn.addEventListener('click', function(){ copyText(genResult.hook, copyHookBtn); });
+
+    var copyArticleBtn = document.getElementById('copy-article');
+    if (copyArticleBtn) copyArticleBtn.addEventListener('click', function(){ copyText(genResult.article, copyArticleBtn); });
+
+    var copyAllBtn = document.getElementById('btn-copy-all');
+    if (copyAllBtn) copyAllBtn.addEventListener('click', function(){
+      var full = genResult.headlines[pickedHeadlineIdx] + '\\n\\n' + genResult.hook + '\\n\\n' + genResult.article;
+      copyText(full, copyAllBtn);
+    });
+
+    var markBtn = document.getElementById('btn-mark-drafted');
+    if (markBtn) markBtn.addEventListener('click', function(){
+      it.status = 'drafted';
+      postToSheet({ action:'update', id: it.id, status:'drafted' });
+      renderAll();
+    });
+  }
+
+  function copyText(text, btnEl){
+    navigator.clipboard.writeText(text).then(function(){
+      var original = btnEl.textContent;
+      btnEl.textContent = 'คัดลอกแล้ว ✓';
+      setTimeout(function(){ btnEl.textContent = original; }, 1500);
+    });
+  }
+
+  /* ---------- add modal ---------- */
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('btn-open-add').addEventListener('click', function(){
+    overlay.hidden = false;
+    document.getElementById('f-title').focus();
+  });
+  document.getElementById('btn-cancel').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !overlay.hidden) closeModal(); });
+
+  function closeModal(){
+    overlay.hidden = true;
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-summary').value = '';
+    document.getElementById('f-source').value = '';
+    document.getElementById('f-url').value = '';
+  }
+
+  document.getElementById('btn-save').addEventListener('click', function(){
+    const title = document.getElementById('f-title').value.trim();
+    if (!title){ document.getElementById('f-title').focus(); return; }
+    const category = document.getElementById('f-category').value;
+    const summary = document.getElementById('f-summary').value.trim();
+    const source = document.getElementById('f-source').value.trim() || 'ไม่ระบุแหล่งที่มา';
+    const url = document.getElementById('f-url').value.trim();
+
+    const newItem = { id:id(), category, status:'new', title, summary, source, url, timestamp:new Date().toISOString(), article:null };
+    items.unshift(newItem);
+    closeModal();
+    renderAll();
+    postToSheet({ action:'add', item:newItem });
+  });
+
+  /* ---------- search ---------- */
+  document.getElementById('search-input').addEventListener('input', function(e){
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderFeed();
+  });
+
+  /* ---------- init ---------- */
+  function renderAll(){
+    renderChips();
+    renderStats();
+    renderFeed();
+    renderWorkspace();
+  }
+
+  initItems().then(renderAll);
+
+})();
+</script>
+
+</body>
+</html>
