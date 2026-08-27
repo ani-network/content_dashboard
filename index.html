@@ -423,6 +423,71 @@
     font-weight:700;
   }
 
+  .img-gallery{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .img-thumb{
+    width:84px; height:84px;
+    border-radius:var(--radius-sm);
+    border:2px solid var(--border);
+    overflow:hidden;
+    cursor:pointer;
+    background:var(--surface-2);
+    flex:none;
+    position:relative;
+  }
+  .img-thumb img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .img-thumb.selected{ border-color:var(--accent-comic); }
+  .img-slot-badge{
+    position:absolute; top:3px; left:3px;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:var(--accent-comic);
+    color:#100E17;
+    font-size:11px;
+    font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .img-remove{
+    position:absolute; top:3px; right:3px;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:rgba(11,10,17,0.75);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff;
+    font-size:13px;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    padding:0;
+  }
+  .img-remove:hover{ background:var(--accent-live); border-color:var(--accent-live); }
+  .img-thumb.none-tile{
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:4px;
+    color:var(--text-faint);
+    font-size:10.5px;
+    text-align:center;
+    padding:6px;
+  }
+  .img-thumb.none-tile.selected{ border-color:var(--accent-comic); color:var(--accent-comic); }
+  .img-selected-info{
+    display:flex; align-items:center; gap:10px;
+    font-size:12px;
+    color:var(--text-muted);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:9px 12px;
+    margin-bottom:16px;
+  }
+  .img-selected-info a{ color:var(--accent-vtuber); text-decoration:none; }
+  .img-selected-info a:hover{ text-decoration:underline; }
+
   .field{ margin-bottom:16px; }
   .field label{
     display:block;
@@ -474,6 +539,37 @@
     padding:11px 14px;
     line-height:1.6;
   }
+
+  .card-canvas-wrap{
+    background:
+      repeating-conic-gradient(#211D2E 0% 25%, #1B1826 0% 50%) 50% / 20px 20px;
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:12px;
+    display:flex;
+    justify-content:center;
+    margin-bottom:10px;
+  }
+  .card-canvas-wrap canvas{
+    width:100%;
+    max-width:280px;
+    height:auto;
+    border-radius:6px;
+    display:block;
+  }
+  .btn-download{
+    display:inline-flex; align-items:center; gap:7px;
+    width:100%;
+    justify-content:center;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-weight:600;
+    font-size:13px;
+    padding:10px 16px;
+    border-radius:100px;
+  }
+  .btn-download:hover{ border-color:var(--accent-comic); color:var(--accent-comic); }
 
   .divider{
     border:none;
@@ -676,6 +772,22 @@
 <div class="modal-overlay" id="modal-overlay" hidden>
   <div class="modal">
     <h2>เพิ่มข่าวใหม่</h2>
+
+    <div class="field">
+      <label for="f-fetch-url">วางลิงก์ข่าว แล้วดึงข้อมูลอัตโนมัติ (ไม่บังคับ)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="f-fetch-url" placeholder="https://...">
+        <button class="btn-secondary" id="btn-fetch-meta" style="white-space:nowrap;">ดึงข้อมูล</button>
+      </div>
+      <p id="fetch-meta-status" style="font-size:11.5px; color:var(--text-faint); margin:6px 0 0; display:none;"></p>
+    </div>
+
+    <div class="field">
+      <label for="f-bulk-paste">หรือวางข่าวทั้งก้อน (คัดลอกหัวข้อ+เนื้อหาจากหน้าเว็บมาวางตรงนี้)</label>
+      <textarea id="f-bulk-paste" placeholder="วางข้อความข่าวทั้งหมด บรรทัดแรกจะถูกใช้เป็นหัวข้อ ที่เหลือเป็นเนื้อหา" style="min-height:90px;"></textarea>
+      <button class="btn-secondary" id="btn-parse-bulk" style="margin-top:8px; width:100%;">✂️ แยกข้อมูล</button>
+    </div>
+
     <div class="field">
       <label for="f-title">หัวข้อข่าว</label>
       <input type="text" id="f-title" placeholder="เช่น ประกาศซีซั่นใหม่ของ...">
@@ -686,7 +798,7 @@
         <option value="anime">Anime</option>
         <option value="game">Game</option>
         <option value="vtuber">VTuber</option>
-        <option value="comic">Comic</option>
+        <option value="comic">Manga</option>
       </select>
     </div>
     <div class="field">
@@ -728,7 +840,7 @@
     anime:  { label:'Anime',  color:'var(--accent-anime)'  },
     game:   { label:'Game',   color:'var(--accent-game)'   },
     vtuber: { label:'VTuber', color:'var(--accent-vtuber)' },
-    comic:  { label:'Comic',  color:'var(--accent-comic)'  },
+    comic:  { label:'Manga',  color:'var(--accent-comic)'  },
   };
 
   const STATUS_LABEL = { new:'ยังไม่เขียน', drafted:'เขียนแล้ว', posted:'โพสต์แล้ว' };
@@ -766,6 +878,12 @@
     { id:'breaking', label:'ข่าวด่วน กระชับ', text:
       'น้ำเสียงข่าวด่วน กระชับ ตรงประเด็น ขึ้นต้นด้วยข้อเท็จจริงสำคัญที่สุดก่อนเสมอ ไม่อ้อมค้อม ' +
       'ประโยคสั้น อ่านง่าย เหมาะกับคนที่มีเวลาน้อย ไม่ใส่ความเห็นส่วนตัวหรือมุกตลก' },
+  ];
+
+  const LAYOUTS = [
+    { id:'1', label:'1 รูป' },
+    { id:'2', label:'2 รูป' },
+    { id:'3', label:'3 รูป' },
   ];
 
   function loadInitialItems(){
@@ -820,6 +938,7 @@
       it.timestamp = new Date(Date.now() - it.mins * 60000).toISOString();
       delete it.mins;
       it.article = null;
+      it.images = [];
       return it;
     });
   }
@@ -830,6 +949,8 @@
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'โหลดข้อมูลไม่สำเร็จ');
     return data.items.map(function(row){
+      let imgs = [];
+      try { imgs = JSON.parse(row.images || '[]'); } catch(e){ imgs = []; }
       return {
         id: String(row.id),
         category: row.category,
@@ -838,6 +959,7 @@
         summary: row.summary,
         source: row.source,
         url: row.url || '',
+        images: imgs,
         timestamp: row.timestamp,
         article: null,
       };
@@ -905,6 +1027,11 @@
     };
   }
 
+  function getActiveHeadline(){
+    if (customHeadlineText !== null) return customHeadlineText;
+    return genResult ? genResult.headlines[pickedHeadlineIdx] : '';
+  }
+
   function showBanner(type, text){
     const el = document.getElementById('sync-banner');
     el.hidden = false;
@@ -928,6 +1055,9 @@
   let pasteAreaOpen = false;
   let pastedText = '';
   let parseError = null;
+  let customHeadlineText = null; // null = ใช้ headline ที่เลือกจาก options ตามปกติ
+  let selectedImageUrls = []; // เรียงตามลำดับที่คลิกเลือก = ลำดับช่องใน layout
+  let selectedLayout = '1'; // '1' | '2' | '3'
 
   async function initItems(){
     const footer = document.getElementById('footer-note');
@@ -1073,6 +1203,9 @@
     pastedText = '';
     parseError = null;
     pickedHeadlineIdx = 0;
+    customHeadlineText = null;
+    selectedImageUrls = [];
+    selectedLayout = '1';
     renderAll();
     if (window.innerWidth < 920){
       document.getElementById('workspace').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -1105,6 +1238,40 @@
     html += '    <p class="card-summary">' + escapeHtml(it.summary) + ' — ' + (it.url ? '<a class="src-link" href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener">' + escapeHtml(it.source) + ' ↗</a>' : '<span class="src">' + escapeHtml(it.source) + '</span>') + '</p>';
     html += '  </div>';
     html += '  <button class="link-btn" id="btn-deselect">เปลี่ยนข่าว</button>';
+    html += '</div>';
+
+    html += '<div class="field">';
+    html += '  <label>เลย์เอาต์ภาพ</label>';
+    html += '  <div class="chip-row" id="layout-row">';
+    LAYOUTS.forEach(function(l){
+      html += '<button type="button" class="chip" data-layout="' + l.id + '" aria-pressed="' + (selectedLayout === l.id ? 'true' : 'false') + '">' + l.label + '</button>';
+    });
+    html += '  </div>';
+    html += '</div>';
+
+    html += '<div class="field">';
+    html += '  <label>รูปประกอบ (คลิกเลือกตามลำดับที่จะใส่ในเลย์เอาต์ — เพิ่มเองโดยวางลิงก์รูปจากบทความต้นทาง)</label>';
+    html += '  <div class="img-gallery" id="img-gallery">';
+    (it.images || []).forEach(function(imgUrl, idx){
+      const slotNum = selectedImageUrls.indexOf(imgUrl); // -1 ถ้ายังไม่ถูกเลือก
+      html += '<div class="img-thumb' + (slotNum > -1 ? ' selected' : '') + '" data-img="' + idx + '">';
+      html += '  <img src="' + escapeHtml(imgUrl) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display=\'none\'">';
+      if (slotNum > -1) html += '  <span class="img-slot-badge">' + (slotNum + 1) + '</span>';
+      html += '  <button type="button" class="img-remove" data-remove="' + idx + '" title="ลบรูปนี้">×</button>';
+      html += '</div>';
+    });
+    html += '<div class="img-thumb none-tile' + (selectedImageUrls.length === 0 ? ' selected' : '') + '" data-img="none">ไม่ใช้รูป<br>(เว้นว่าง)</div>';
+    html += '  </div>';
+    html += '  <div style="display:flex; gap:8px;">';
+    html += '    <input type="text" id="img-url-input" placeholder="วางลิงก์รูปที่นี่ (https://...)" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; color:var(--text); font-size:13px;">';
+    html += '    <button class="btn-secondary" id="btn-add-img" style="white-space:nowrap;">+ เพิ่มรูป</button>';
+    html += '  </div>';
+    if (!it.images || it.images.length === 0){
+      html += '  <p style="font-size:11.5px; color:var(--text-faint); margin:8px 0 0;">ยังไม่มีรูป — เปิดลิงก์ข่าวต้นทางด้านบน คัดลอก URL รูปที่ต้องการมาวางในช่องด้านบนได้เลย</p>';
+    } else {
+      const maxSlots = parseInt(selectedLayout, 10);
+      html += '  <p style="font-size:11.5px; color:var(--text-faint); margin:8px 0 0;">เลือกแล้ว ' + selectedImageUrls.length + '/' + maxSlots + ' ช่อง — คลิกรูปที่เลือกแล้วซ้ำเพื่อเอาออก</p>';
+    }
     html += '</div>';
 
     html += '<div class="field">';
@@ -1157,6 +1324,18 @@
       html += '</div>';
 
       html += '<div class="field">';
+      html += '  <label for="headline-edit-input">ปรับแต่งข้อความ Headline (แก้ไขได้อิสระ)</label>';
+      html += '  <input type="text" class="style-input" id="headline-edit-input" style="min-height:unset;" value="' + escapeHtml(getActiveHeadline()) + '">';
+      html += '</div>';
+
+      html += '<div class="field">';
+      html += '  <label>ภาพ Headline (ลองฝังรูปที่เลือกให้อัตโนมัติ)</label>';
+      html += '  <div class="card-canvas-wrap"><canvas id="headline-canvas" width="1080" height="1200"></canvas></div>';
+      html += '  <p id="img-embed-warning" style="display:none; font-size:11.5px; color:var(--accent-live); margin:0 0 10px; line-height:1.6;">⚠️ เว็บต้นทางของรูปนี้ไม่อนุญาตให้ฝังลงไฟล์ดาวน์โหลด (CORS) — ลองรูปอื่น หรือดาวน์โหลดรูปนี้แยกแล้วเอาไปประกอบเองใน Canva/Photoshop</p>';
+      html += '  <button class="btn-download" id="btn-download-png">⬇️ ดาวน์โหลดภาพ PNG</button>';
+      html += '</div>';
+
+      html += '<div class="field">';
       html += '  <div class="field-head"><label>Hook เปิดเรื่อง</label><button class="copy-btn" id="copy-hook">คัดลอก</button></div>';
       html += '  <div class="hook-box">' + escapeHtml(genResult.hook) + '</div>';
       html += '</div>';
@@ -1177,7 +1356,72 @@
 
     // bind events
     var deselectBtn = document.getElementById('btn-deselect');
-    if (deselectBtn) deselectBtn.addEventListener('click', function(){ selectedId = null; genResult = null; pasteAreaOpen = false; pastedText = ''; parseError = null; renderAll(); });
+    if (deselectBtn) deselectBtn.addEventListener('click', function(){ selectedId = null; genResult = null; pasteAreaOpen = false; pastedText = ''; parseError = null; customHeadlineText = null; selectedImageUrls = []; selectedLayout = '1'; renderAll(); });
+
+    var layoutRow = document.getElementById('layout-row');
+    if (layoutRow){
+      layoutRow.querySelectorAll('.chip').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          selectedLayout = btn.dataset.layout;
+          const max = parseInt(selectedLayout, 10);
+          if (selectedImageUrls.length > max) selectedImageUrls = selectedImageUrls.slice(0, max);
+          renderWorkspace();
+        });
+      });
+    }
+
+    var imgGallery = document.getElementById('img-gallery');
+    if (imgGallery){
+      imgGallery.querySelectorAll('.img-thumb').forEach(function(thumb){
+        thumb.addEventListener('click', function(e){
+          if (e.target.closest('.img-remove')) return; // อย่าเลือกรูปตอนกดปุ่มลบ
+          const key = thumb.dataset.img;
+          if (key === 'none'){
+            selectedImageUrls = [];
+            renderWorkspace();
+            return;
+          }
+          const url = (it.images || [])[parseInt(key, 10)];
+          const existingIdx = selectedImageUrls.indexOf(url);
+          const max = parseInt(selectedLayout, 10);
+          if (existingIdx > -1){
+            selectedImageUrls.splice(existingIdx, 1); // คลิกซ้ำ = เอาออก
+          } else if (selectedImageUrls.length < max){
+            selectedImageUrls.push(url);
+          } // ถ้าเต็มโควตาแล้ว คลิกรูปใหม่จะไม่มีผล ต้องเอาตัวเก่าออกก่อน
+          renderWorkspace();
+        });
+      });
+      imgGallery.querySelectorAll('.img-remove').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.remove, 10);
+          const removedUrl = (it.images || [])[idx];
+          it.images = (it.images || []).filter(function(_, i){ return i !== idx; });
+          selectedImageUrls = selectedImageUrls.filter(function(u){ return u !== removedUrl; });
+          renderWorkspace();
+          postToSheet({ action:'update', id: it.id, images: it.images });
+        });
+      });
+    }
+
+    var addImgBtn = document.getElementById('btn-add-img');
+    var imgUrlInput = document.getElementById('img-url-input');
+    if (addImgBtn && imgUrlInput){
+      const doAdd = function(){
+        const val = imgUrlInput.value.trim();
+        if (!val) return;
+        it.images = (it.images || []).concat([val]);
+        const max = parseInt(selectedLayout, 10);
+        if (selectedImageUrls.length < max) selectedImageUrls.push(val);
+        renderWorkspace();
+        postToSheet({ action:'update', id: it.id, images: it.images });
+      };
+      addImgBtn.addEventListener('click', doAdd);
+      imgUrlInput.addEventListener('keydown', function(e){
+        if (e.key === 'Enter'){ e.preventDefault(); doAdd(); }
+      });
+    }
 
     var toneRow = document.getElementById('tone-row');
     if (toneRow){
@@ -1246,10 +1490,46 @@
       headlineOptsWrap.querySelectorAll('.headline-opt').forEach(function(btn){
         btn.addEventListener('click', function(){
           pickedHeadlineIdx = parseInt(btn.dataset.idx, 10);
+          customHeadlineText = null;
           renderWorkspace();
         });
       });
     }
+
+    var headlineEditInput = document.getElementById('headline-edit-input');
+    if (headlineEditInput) headlineEditInput.addEventListener('input', function(e){
+      customHeadlineText = e.target.value;
+      if (headlineCanvas) renderHeadlineCanvas(headlineCanvas, getActiveHeadline(), it.category, selectedLayout, loadedHeadlineImgs);
+    });
+
+    var headlineCanvas = document.getElementById('headline-canvas');
+    if (headlineCanvas && genResult){
+      const drawNow = function(){
+        ensureHeadlineImagesLoaded(function(imgs){
+          renderHeadlineCanvas(headlineCanvas, getActiveHeadline(), it.category, selectedLayout, imgs);
+          const warnEl = document.getElementById('img-embed-warning');
+          if (warnEl){
+            const anyFailed = selectedImageUrls.length > 0 && imgs.some(function(x){ return x === null; });
+            warnEl.style.display = anyFailed ? 'block' : 'none';
+          }
+        });
+      };
+      if (document.fonts && document.fonts.ready){
+        document.fonts.ready.then(drawNow);
+      } else {
+        drawNow();
+      }
+    }
+
+    var downloadBtn = document.getElementById('btn-download-png');
+    if (downloadBtn) downloadBtn.addEventListener('click', function(){
+      const safeTitle = it.title.replace(/[^\u0E00-\u0E7Fa-zA-Z0-9]+/g, '-').slice(0, 40);
+      try {
+        downloadCanvasPng(headlineCanvas, 'ani-network-headline-' + safeTitle + '.png');
+      } catch(err){
+        alert('ดาวน์โหลดไม่สำเร็จ เพราะเว็บต้นทางของรูปที่ฝังไว้ไม่อนุญาต (CORS)\nลองเอารูปนี้ออก หรือลองรูปอื่นแทน แล้วดาวน์โหลดใหม่');
+      }
+    });
 
     var copyHookBtn = document.getElementById('copy-hook');
     if (copyHookBtn) copyHookBtn.addEventListener('click', function(){ copyText(genResult.hook, copyHookBtn); });
@@ -1259,7 +1539,7 @@
 
     var copyAllBtn = document.getElementById('btn-copy-all');
     if (copyAllBtn) copyAllBtn.addEventListener('click', function(){
-      var full = genResult.headlines[pickedHeadlineIdx] + '\\n\\n' + genResult.hook + '\\n\\n' + genResult.article;
+      var full = getActiveHeadline() + String.fromCharCode(10,10) + genResult.hook + String.fromCharCode(10,10) + genResult.article;
       copyText(full, copyAllBtn);
     });
 
@@ -1279,6 +1559,267 @@
     });
   }
 
+  /* ---------- สร้างภาพ Headline Card ด้วย Canvas (พื้นด้านบนโปร่งใส) ---------- */
+  const CATEGORY_HEX = { anime:'#FF5E8A', game:'#3FD9C7', vtuber:'#B18CFF', comic:'#FFC24B' };
+
+  function roundRect(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function wrapTextCanvas(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+    const chars = Array.from(text);
+    let line = '';
+    let lines = [];
+    for (let i = 0; i < chars.length; i++){
+      const test = line + chars[i];
+      if (ctx.measureText(test).width > maxWidth && line !== ''){
+        lines.push(line);
+        line = chars[i];
+        if (lines.length >= maxLines) break;
+      } else {
+        line = test;
+      }
+    }
+    if (lines.length < maxLines && line) lines.push(line);
+    if (lines.length === maxLines && Array.from(lines[maxLines-1] + line).length < chars.length){
+      // ตัดคำสุดท้ายให้เหลือที่ใส่ ... ถ้าเนื้อหายังไม่จบ
+      let last = lines[maxLines-1];
+      while (ctx.measureText(last + '…').width > maxWidth && last.length > 0){
+        last = last.slice(0, -1);
+      }
+      lines[maxLines-1] = last + '…';
+    }
+    lines.forEach(function(l, i){ ctx.fillText(l, x, y + i * lineHeight); });
+    return lines.length;
+  }
+
+  function drawCoverImage(ctx, img, x, y, w, h){
+    const scale = Math.max(w / img.width, h / img.height);
+    const dw = img.width * scale, dh = img.height * scale;
+    const dx = x + (w - dw) / 2, dy = y + (h - dh) / 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+    ctx.drawImage(img, dx, dy, dw, dh);
+    ctx.restore();
+  }
+
+  function loadImageForCanvas(url){
+    return new Promise(function(resolve){
+      if (!url){ resolve(null); return; }
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){ resolve(img); };
+      img.onerror = function(){ resolve(null); };
+      img.src = url;
+    });
+  }
+
+  let loadedHeadlineImgs = [];
+  let loadedHeadlineImgsKey = undefined;
+  function ensureHeadlineImagesLoaded(callback){
+    const key = JSON.stringify(selectedImageUrls);
+    if (key === loadedHeadlineImgsKey){
+      callback(loadedHeadlineImgs);
+      return;
+    }
+    Promise.all(selectedImageUrls.map(loadImageForCanvas)).then(function(imgs){
+      loadedHeadlineImgs = imgs;
+      loadedHeadlineImgsKey = key;
+      callback(imgs);
+    });
+  }
+
+  function getLayoutSlots(layout, topW, topH){
+    const gap = 6;
+    if (layout === '2'){
+      const w = (topW - gap) / 2;
+      return [
+        { x:0, y:0, w:w, h:topH },
+        { x:w + gap, y:0, w:w, h:topH },
+      ];
+    }
+    if (layout === '3'){
+      const bigW = topW * 0.62;
+      const smallW = topW - bigW - gap;
+      const smallH = (topH - gap) / 2;
+      return [
+        { x:0, y:0, w:bigW, h:topH },
+        { x:bigW + gap, y:0, w:smallW, h:smallH },
+        { x:bigW + gap, y:smallH + gap, w:smallW, h:smallH },
+      ];
+    }
+    return [{ x:0, y:0, w:topW, h:topH }]; // '1'
+  }
+
+  function renderHeadlineCanvas(canvas, headlineText, category, layout, loadedImgs){
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const color = CATEGORY_HEX[category] || '#B18CFF';
+
+    ctx.clearRect(0, 0, W, H); // พื้นบนปล่อยโปร่งใสไว้ ถ้าไม่มีรูป
+
+    const barH = Math.round(H * 0.33);
+    const barY = H - barH;
+
+    // วาดรูปตามช่องของ layout (ช่องไหนไม่มีรูป/โหลดไม่สำเร็จ ปล่อยโปร่งใส)
+    const slots = getLayoutSlots(layout, W, barY);
+    slots.forEach(function(slot, i){
+      const img = loadedImgs ? loadedImgs[i] : null;
+      if (img) drawCoverImage(ctx, img, slot.x, slot.y, slot.w, slot.h);
+    });
+
+    // แถบดำด้านล่าง
+    ctx.fillStyle = '#0B0A11';
+    ctx.fillRect(0, barY, W, barH);
+
+    // badge เปลี่ยนข้อความตามหมวดข่าว ไล่สีชมพู-ม่วง คาบรอยต่อระหว่างพื้นที่โปร่งใสกับแถบดำ
+    ctx.font = '800 30px "Noto Sans Thai", sans-serif';
+    const badgePadX = 30;
+    const badgeText = (catMeta(category).label || 'NEWS').toUpperCase();
+    const badgeTextW = ctx.measureText(badgeText).width;
+    const badgeW = badgeTextW + badgePadX * 2;
+    const badgeH = 64;
+    const badgeX = 48;
+    const badgeY = barY - badgeH / 2; // ครึ่งบนโผล่เหนือแถบดำ ครึ่งล่างจมอยู่ในแถบดำ
+
+    const grad = ctx.createLinearGradient(badgeX, 0, badgeX + badgeW, 0);
+    grad.addColorStop(0, '#FF5E8A');
+    grad.addColorStop(1, '#B18CFF');
+    ctx.fillStyle = grad;
+    roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeH / 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(badgeText, badgeX + badgePadX, badgeY + badgeH / 2 + 2);
+
+    // headline ตัวหนาสีขาว
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 50px "Noto Sans Thai", sans-serif';
+    ctx.textBaseline = 'alphabetic';
+    wrapTextCanvas(ctx, headlineText, 48, badgeY + badgeH + 66, W - 96, 62, 3);
+
+    // แถบไล่สีบางๆ ที่ขอบล่างสุดของภาพ
+    const stripH = 10;
+    const stripGrad = ctx.createLinearGradient(0, 0, W, 0);
+    stripGrad.addColorStop(0, '#FF5E8A');
+    stripGrad.addColorStop(0.5, '#B18CFF');
+    stripGrad.addColorStop(1, '#3FD9C7');
+    ctx.fillStyle = stripGrad;
+    ctx.fillRect(0, H - stripH, W, stripH);
+
+    // แถวไอคอนโซเชียล + แบรนด์ เหนือแถบไล่สีเล็กน้อย
+    const iconY = H - stripH - 58;
+    const iconR = 22;
+    const label = 'Ani เมาะ';
+    const groups = [
+      { bg:'#1877F2', glyph:'f', glyphSize:22 },
+      { bg:'#0F1419', glyph:'X', glyphSize:22 },
+      { gradient:true, glyph:'IG', glyphSize:15 },
+    ];
+    ctx.font = '600 22px "Inter", "Noto Sans Thai", sans-serif';
+    const labelW = ctx.measureText(label).width;
+    const groupGap = 34;
+    const groupW = iconR * 2 + 12 + labelW;
+    const totalW = groupW * groups.length + groupGap * (groups.length - 1);
+    let gx = (W - totalW) / 2;
+
+    groups.forEach(function(g){
+      ctx.beginPath();
+      ctx.arc(gx + iconR, iconY, iconR, 0, Math.PI * 2);
+      if (g.gradient){
+        const igGrad = ctx.createLinearGradient(gx, iconY - iconR, gx + iconR * 2, iconY + iconR);
+        igGrad.addColorStop(0, '#FEDA75');
+        igGrad.addColorStop(0.3, '#FA7E1E');
+        igGrad.addColorStop(0.55, '#D62976');
+        igGrad.addColorStop(0.8, '#962FBF');
+        igGrad.addColorStop(1, '#4F5BD5');
+        ctx.fillStyle = igGrad;
+      } else {
+        ctx.fillStyle = g.bg;
+      }
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '700 ' + g.glyphSize + 'px "Inter", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(g.glyph, gx + iconR, iconY + 1);
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = '#C8C4D6';
+      ctx.font = '600 22px "Inter", "Noto Sans Thai", sans-serif';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, gx + iconR * 2 + 12, iconY + 1);
+
+      gx += groupW + groupGap;
+    });
+  }
+
+  function downloadCanvasPng(canvas, filename){
+    canvas.toBlob(function(blob){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  }
+
+  async function fetchArticleMetaFromBackend(url){
+    if (!SHEET_API_URL){
+      throw new Error('ยังไม่ได้เชื่อมต่อ Google Apps Script backend — ดู setup-guide.md');
+    }
+    const res = await fetch(SHEET_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action:'fetchMeta', url:url }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'ดึงข้อมูลไม่สำเร็จ');
+    return data.result; // { title, summary, image, siteName }
+  }
+
+  function hostnameOf(url){
+    try { return new URL(url).hostname.replace(/^www\./, ''); }
+    catch(e){ return ''; }
+  }
+
+  /* แยกหัวข้อ/เนื้อหาจากข้อความข่าวที่คัดลอกมาวางทั้งก้อน
+     กติกาง่ายๆ: บรรทัดแรกที่ไม่ว่าง = หัวข้อ ที่เหลือ = เนื้อหา
+     ถ้าบรรทัดแรกยาวเกินไป (ไม่น่าใช่หัวข้อ) ให้ตัดที่ประโยคแรกแทน */
+  function parseBulkNewsText(text){
+    const trimmed = (text || '').trim();
+    if (!trimmed) return { title:'', summary:'' };
+
+    const lines = trimmed.split(/\n+/).map(function(l){ return l.trim(); }).filter(Boolean);
+    let title = lines[0] || '';
+    let rest = lines.slice(1).join(' ').trim();
+
+    if (title.length > 120){
+      const m = title.match(/^(.{20,120}?[.!?ๆฯ])\s/);
+      if (m){
+        rest = (title.slice(m[1].length).trim() + ' ' + rest).trim();
+        title = m[1].trim();
+      } else {
+        rest = (title.slice(120).trim() + ' ' + rest).trim();
+        title = title.slice(0, 120).trim() + '…';
+      }
+    }
+    return { title: title, summary: rest };
+  }
+
   /* ---------- add modal ---------- */
   const overlay = document.getElementById('modal-overlay');
   document.getElementById('btn-open-add').addEventListener('click', function(){
@@ -1289,13 +1830,63 @@
   overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !overlay.hidden) closeModal(); });
 
+  let fetchedImageUrl = null;
+
+  function setFetchStatus(text, isError){
+    const el = document.getElementById('fetch-meta-status');
+    el.style.display = text ? 'block' : 'none';
+    el.textContent = text || '';
+    el.style.color = isError ? 'var(--accent-live)' : 'var(--text-faint)';
+  }
+
+  document.getElementById('btn-fetch-meta').addEventListener('click', async function(){
+    const url = document.getElementById('f-fetch-url').value.trim();
+    if (!url){ setFetchStatus('กรุณาวางลิงก์ข่าวก่อน', true); return; }
+    const btn = this;
+    btn.disabled = true;
+    setFetchStatus('กำลังดึงข้อมูล...', false);
+    try {
+      const meta = await fetchArticleMetaFromBackend(url);
+      if (meta.title) document.getElementById('f-title').value = meta.title;
+      if (meta.summary) document.getElementById('f-summary').value = meta.summary;
+      document.getElementById('f-source').value = meta.siteName || hostnameOf(url);
+      document.getElementById('f-url').value = url;
+      fetchedImageUrl = meta.image || null;
+      setFetchStatus(
+        (meta.title ? '✓ ดึงข้อมูลสำเร็จ' : '⚠ ดึงได้บางส่วน กรุณาตรวจสอบและแก้ไขเอง') +
+        (fetchedImageUrl ? ' (พบรูปด้วย)' : ''),
+        !meta.title
+      );
+    } catch(err){
+      setFetchStatus('ดึงข้อมูลไม่สำเร็จ: ' + err.message + ' — กรอกเองแทนได้เลย', true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   function closeModal(){
     overlay.hidden = true;
     document.getElementById('f-title').value = '';
     document.getElementById('f-summary').value = '';
     document.getElementById('f-source').value = '';
     document.getElementById('f-url').value = '';
+    document.getElementById('f-fetch-url').value = '';
+    document.getElementById('f-bulk-paste').value = '';
+    setFetchStatus('', false);
+    fetchedImageUrl = null;
   }
+
+  document.getElementById('btn-parse-bulk').addEventListener('click', function(){
+    const raw = document.getElementById('f-bulk-paste').value;
+    const parsed = parseBulkNewsText(raw);
+    if (!parsed.title){
+      setFetchStatus('กรุณาวางข้อความข่าวก่อน', true);
+      return;
+    }
+    document.getElementById('f-title').value = parsed.title;
+    document.getElementById('f-summary').value = parsed.summary;
+    setFetchStatus('✓ แยกข้อมูลแล้ว — ตรวจสอบและแก้ไขได้ตามต้องการ', false);
+  });
 
   document.getElementById('btn-save').addEventListener('click', function(){
     const title = document.getElementById('f-title').value.trim();
@@ -1304,8 +1895,9 @@
     const summary = document.getElementById('f-summary').value.trim();
     const source = document.getElementById('f-source').value.trim() || 'ไม่ระบุแหล่งที่มา';
     const url = document.getElementById('f-url').value.trim();
+    const images = fetchedImageUrl ? [fetchedImageUrl] : [];
 
-    const newItem = { id:id(), category, status:'new', title, summary, source, url, timestamp:new Date().toISOString(), article:null };
+    const newItem = { id:id(), category, status:'new', title, summary, source, url, images, timestamp:new Date().toISOString(), article:null };
     items.unshift(newItem);
     closeModal();
     renderAll();
