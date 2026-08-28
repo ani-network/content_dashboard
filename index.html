@@ -478,6 +478,21 @@
     padding:6px;
   }
   .img-thumb.none-tile.selected{ border-color:var(--accent-comic); color:var(--accent-comic); }
+  .img-thumb.paste-zone{
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:2px;
+    color:var(--text-faint);
+    font-size:9.5px;
+    text-align:center;
+    padding:6px;
+    border-style:dashed;
+    cursor:text;
+  }
+  .img-thumb.paste-zone:focus{
+    outline:none;
+    border-color:var(--accent-vtuber);
+    color:var(--accent-vtuber);
+  }
   .img-selected-info{
     display:flex; align-items:center; gap:10px;
     font-size:12px;
@@ -1012,7 +1027,9 @@
       'HEADLINE 2: [หัวข้อทางเลือกที่ 2]\n' +
       'HEADLINE 3: [หัวข้อทางเลือกที่ 3]\n' +
       'HOOK: [ประโยคเปิดบทความ 1-2 ประโยคที่ทำให้คนอยากอ่านต่อ]\n' +
-      'ARTICLE: [เนื้อหาบทความเต็ม ความยาวประมาณ 150-250 คำ ในสไตล์เพจตามที่กำหนด]'
+      'ARTICLE: [เนื้อหาบทความ ให้เขียนแค่ 2 ย่อหน้าเท่านั้น ไม่ว่าจะเลือกโทน\n' +
+      'ไหนก็ตาม กระชับ อ่านจบไว ไม่ต้องใส่รายละเอียดครบทุกจุดจากสรุปข่าว\n' +
+      'เลือกเฉพาะประเด็นที่สำคัญที่สุดมาเขียน เขียนในสไตล์เพจตามที่กำหนด]'
     );
   }
 
@@ -1277,6 +1294,7 @@
       html += '</div>';
     });
     html += '<div class="img-thumb none-tile' + (selectedImageUrls.length === 0 ? ' selected' : '') + '" data-img="none">ไม่ใช้รูป<br>(เว้นว่าง)</div>';
+    html += '<div class="img-thumb paste-zone" id="img-paste-zone" tabindex="0" title="คลิกที่นี่แล้วกด Ctrl+V เพื่อวางรูปจากคลิปบอร์ด">📋<br>วางรูป<br>(Ctrl+V)</div>';
     html += '  </div>';
     html += '  <div style="display:flex; gap:8px;">';
     html += '    <input type="text" id="img-url-input" placeholder="วางลิงก์รูปที่นี่ (https://...)" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; color:var(--text); font-size:13px;">';
@@ -1345,6 +1363,8 @@
       html += '<div class="field">';
       html += '  <label for="headline-edit-input">ปรับแต่งข้อความ Headline (แก้ไขได้อิสระ)</label>';
       html += '  <input type="text" class="style-input" id="headline-edit-input" style="min-height:unset;" value="' + escapeHtml(getActiveHeadline()) + '">';
+      html += '  <button type="button" class="btn-secondary" id="btn-toggle-highlight" style="margin-top:8px;">🖍️ ไฮไลต์คำที่เลือก</button>';
+      html += '  <p style="font-size:11px; color:var(--text-faint); margin:6px 0 0;">ลากเลือกคำในช่องด้านบน แล้วกดปุ่มนี้เพื่อทำให้คำนั้นเป็นสีเหลือง+ตัวใหญ่ขึ้นในภาพ กดซ้ำเพื่อยกเลิกไฮไลต์</p>';
       html += '</div>';
 
       html += '<div class="field">';
@@ -1461,6 +1481,31 @@
       });
     }
 
+    var pasteZone = document.getElementById('img-paste-zone');
+    if (pasteZone){
+      pasteZone.addEventListener('click', function(){ pasteZone.focus(); });
+      pasteZone.addEventListener('paste', function(e){
+        e.preventDefault();
+        const items = (e.clipboardData || window.clipboardData).items;
+        let found = false;
+        const max = parseInt(selectedLayout, 10);
+        for (let i = 0; i < items.length; i++){
+          if (items[i].type.indexOf('image') !== -1){
+            const blob = items[i].getAsFile();
+            const blobUrl = URL.createObjectURL(blob);
+            it.images = (it.images || []).concat([blobUrl]);
+            if (selectedImageUrls.length < max) selectedImageUrls.push(blobUrl);
+            found = true;
+          }
+        }
+        if (found){
+          renderWorkspace(); // ไม่ sync ไป Sheet เพราะเป็น blob URL ใช้ได้แค่เซสชันนี้
+        } else {
+          alert('ไม่พบรูปในคลิปบอร์ด — ลองคลิกขวา "Copy image" จากเว็บข่าวมาใหม่ แล้วกด Ctrl+V อีกครั้ง');
+        }
+      });
+    }
+
     var toneRow = document.getElementById('tone-row');
     if (toneRow){
       toneRow.querySelectorAll('.tone-chip').forEach(function(btn){
@@ -1540,6 +1585,36 @@
       if (headlineCanvas) renderHeadlineCanvas(headlineCanvas, getActiveHeadline(), it.category, selectedLayout, loadedHeadlineImgs);
     });
 
+    var toggleHighlightBtn = document.getElementById('btn-toggle-highlight');
+    if (toggleHighlightBtn && headlineEditInput){
+      toggleHighlightBtn.addEventListener('click', function(){
+        const start = headlineEditInput.selectionStart;
+        const end = headlineEditInput.selectionEnd;
+        if (start === end){
+          alert('กรุณาลากเลือกคำในช่อง Headline ก่อนกดปุ่มนี้');
+          return;
+        }
+        const val = headlineEditInput.value;
+        const selected = val.slice(start, end);
+        const before = val.slice(Math.max(0, start - 2), start);
+        const after = val.slice(end, end + 2);
+        let newVal, newStart, newEnd;
+        if (before === '**' && after === '**'){
+          // เลือกคำที่ไฮไลต์อยู่แล้ว → เอาออก
+          newVal = val.slice(0, start - 2) + selected + val.slice(end + 2);
+          newStart = start - 2; newEnd = end - 2;
+        } else {
+          newVal = val.slice(0, start) + '**' + selected + '**' + val.slice(end);
+          newStart = start; newEnd = end + 4;
+        }
+        headlineEditInput.value = newVal;
+        customHeadlineText = newVal;
+        headlineEditInput.focus();
+        headlineEditInput.setSelectionRange(newStart, newEnd);
+        if (headlineCanvas) renderHeadlineCanvas(headlineCanvas, getActiveHeadline(), it.category, selectedLayout, loadedHeadlineImgs);
+      });
+    }
+
     var headlineCanvas = document.getElementById('headline-canvas');
     if (headlineCanvas && genResult){
       const drawNow = function(){
@@ -1577,7 +1652,7 @@
 
     var copyAllBtn = document.getElementById('btn-copy-all');
     if (copyAllBtn) copyAllBtn.addEventListener('click', function(){
-      var full = getActiveHeadline() + String.fromCharCode(10,10) + genResult.hook + String.fromCharCode(10,10) + genResult.article;
+      var full = stripHighlightMarkup(getActiveHeadline()) + String.fromCharCode(10,10) + genResult.hook + String.fromCharCode(10,10) + genResult.article;
       copyText(full, copyAllBtn);
     });
 
@@ -1608,6 +1683,88 @@
     ctx.arcTo(x, y + h, x, y, r);
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
+  }
+
+  /* ---------- ระบบไฮไลต์ headline แบบอิสระ (markup **...**) ---------- */
+  const HIGHLIGHT_COLOR = '#FFD400';
+
+  function parseHeadlineMarkup(text){
+    const tokens = [];
+    let i = 0;
+    let hi = false;
+    while (i < text.length){
+      if (text.slice(i, i + 2) === '**'){
+        hi = !hi;
+        i += 2;
+        continue;
+      }
+      tokens.push({ ch: text[i], hi: hi });
+      i++;
+    }
+    return tokens;
+  }
+
+  function stripHighlightMarkup(text){
+    return (text || '').split('**').join('');
+  }
+
+  function wrapRichHeadline(ctx, tokens, x, startY, maxWidth, lineHeight, maxLines, normalFont, highlightFont){
+    function tokenWidth(tok){
+      ctx.font = tok.hi ? highlightFont : normalFont;
+      return ctx.measureText(tok.ch).width;
+    }
+
+    const lines = [];
+    let currentLine = [];
+    let currentWidth = 0;
+
+    for (let idx = 0; idx < tokens.length; idx++){
+      const tok = tokens[idx];
+      const w = tokenWidth(tok);
+      if (currentWidth + w > maxWidth && currentLine.length > 0){
+        lines.push(currentLine);
+        currentLine = [];
+        currentWidth = 0;
+        if (lines.length >= maxLines) break;
+      }
+      currentLine.push(tok);
+      currentWidth += w;
+    }
+    if (lines.length < maxLines && currentLine.length) lines.push(currentLine);
+
+    const usedCount = lines.reduce(function (sum, l) { return sum + l.length; }, 0);
+    if (lines.length === maxLines && usedCount < tokens.length && lines[maxLines - 1].length){
+      let last = lines[maxLines - 1];
+      while (last.length > 0){
+        const testLine = last.concat([{ ch: '…', hi: last[last.length - 1].hi }]);
+        let testWidth = 0;
+        testLine.forEach(function (t) { testWidth += tokenWidth(t); });
+        if (testWidth <= maxWidth) { last = testLine; break; }
+        last = last.slice(0, -1);
+      }
+      lines[maxLines - 1] = last;
+    }
+
+    lines.forEach(function (line, li){
+      let cx = x;
+      let i = 0;
+      while (i < line.length){
+        const hi = line[i].hi;
+        let j = i;
+        let runText = '';
+        while (j < line.length && line[j].hi === hi){
+          runText += line[j].ch;
+          j++;
+        }
+        ctx.font = hi ? highlightFont : normalFont;
+        ctx.fillStyle = hi ? HIGHLIGHT_COLOR : '#FFFFFF';
+        ctx.fillText(runText, cx, startY + li * lineHeight);
+        cx += ctx.measureText(runText).width;
+        i = j;
+      }
+    });
+
+    return lines.length;
   }
 
   function wrapTextCanvas(ctx, text, x, y, maxWidth, lineHeight, maxLines){
@@ -1739,11 +1896,12 @@
     ctx.textBaseline = 'middle';
     ctx.fillText(badgeText, badgeX + badgePadX, badgeY + badgeH / 2 + 2);
 
-    // headline ตัวหนาสีขาว
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = '700 50px "Noto Sans Thai", sans-serif';
+    // headline — รองรับไฮไลต์บางส่วนด้วย markup **...** (สีเหลือง+ตัวใหญ่กว่า)
     ctx.textBaseline = 'alphabetic';
-    wrapTextCanvas(ctx, headlineText, 48, badgeY + badgeH + 66, W - 96, 62, 3);
+    const normalFont = '700 50px "Noto Sans Thai", sans-serif';
+    const highlightFont = '800 60px "Noto Sans Thai", sans-serif';
+    const headlineTokens = parseHeadlineMarkup(headlineText);
+    wrapRichHeadline(ctx, headlineTokens, 48, badgeY + badgeH + 70, W - 96, 76, 3, normalFont, highlightFont);
 
     // แถบไล่สีบางๆ ที่ขอบล่างสุดของภาพ
     const stripH = 10;
