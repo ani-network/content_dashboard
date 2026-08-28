@@ -23,6 +23,8 @@
     --accent-game:#3FD9C7;
     --accent-vtuber:#B18CFF;
     --accent-comic:#FFC24B;
+    --accent-movie:#FF7A45;
+    --accent-news:#4DA3FF;
     --accent-live:#FF3B5C;
 
     --radius:14px;
@@ -303,6 +305,18 @@
     border-radius:100px;
   }
   .cat-badge .dot-cat{ width:6px; height:6px; border-radius:50%; }
+
+  .cat-select{
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:100px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .cat-select option{ background:var(--surface-2); color:var(--text); text-transform:none; }
 
   .status-pill{
     font-family:var(--font-mono);
@@ -849,6 +863,8 @@
           <option value="game">Game</option>
           <option value="vtuber">VTuber</option>
           <option value="comic">Manga</option>
+          <option value="movie">Movie</option>
+          <option value="news">News</option>
         </select>
       </div>
       <div class="field">
@@ -893,6 +909,8 @@
     game:   { label:'Game',   color:'var(--accent-game)'   },
     vtuber: { label:'VTuber', color:'var(--accent-vtuber)' },
     comic:  { label:'Manga',  color:'var(--accent-comic)'  },
+    movie:  { label:'Movie',  color:'var(--accent-movie)'  },
+    news:   { label:'News',   color:'var(--accent-news)'   },
   };
 
   const STATUS_LABEL = { new:'ยังไม่เขียน', drafted:'เขียนแล้ว', posted:'โพสต์แล้ว' };
@@ -905,31 +923,24 @@
   ];
 
   const DEFAULT_STYLE_GUIDE =
-    'น้ำเสียงเป็นกันเอง กวนๆ แบบเพื่อนคุยกัน ใช้ภาษาวัยรุ่นได้ มีมุกตลกแทรกได้บ้าง ' +
-    'ใช้อีโมจิพอประมาณไม่เยอะเกินไป ไม่เป็นทางการจนเกินไป ลงท้ายบทความด้วยประโยคชวนผู้อ่านคอมเมนต์หรือแชร์ความเห็น ' +
-    'หลีกเลี่ยงการสปอยล์เนื้อหาสำคัญเกินความจำเป็น';
+    'เขียนแบบข่าวสั้นกระชับ ตรงประเด็น ไม่อ้อมค้อม บอกข้อเท็จจริงสำคัญที่สุดก่อนเสมอ ' +
+    'ประโยคสั้น อ่านง่าย ไม่ใส่ความเห็นส่วนตัวหรือมุกตลก เหมาะกับคนที่มีเวลาน้อย';
 
   const TONE_PRESETS = [
-    { id:'casual', label:'กวนๆ เป็นกันเอง', text:
-      'น้ำเสียงเป็นกันเอง กวนๆ แบบเพื่อนคุยกัน ใช้ภาษาวัยรุ่นได้ มีมุกตลกแทรกได้บ้าง ' +
-      'ใช้อีโมจิพอประมาณไม่เยอะเกินไป ไม่เป็นทางการจนเกินไป ลงท้ายบทความด้วยประโยคชวนผู้อ่านคอมเมนต์หรือแชร์ความเห็น ' +
-      'หลีกเลี่ยงการสปอยล์เนื้อหาสำคัญเกินความจำเป็น' },
-    { id:'hype', label:'ตื่นเต้น กระตุ้นอยากรู้', text:
-      'น้ำเสียงตื่นเต้น กระตุ้นความอยากรู้อยากเห็นตั้งแต่ประโยคแรก ใช้คำที่ทรงพลังสร้างความรู้สึกเร่งด่วน ' +
-      'เน้นจุดที่น่าตกใจ/น่าประหลาดใจของข่าวเป็นพิเศษ ใช้เครื่องหมายอัศเจรีย์ได้บ้างแต่ไม่มากเกินไป ' +
-      'ลงท้ายด้วยคำถามชวนให้คนอยากรู้เรื่องต่อไป' },
-    { id:'professional', label:'จริงจัง มืออาชีพ', text:
-      'น้ำเสียงจริงจัง เป็นมืออาชีพ ให้ข้อมูลครบถ้วนถูกต้องตามข้อเท็จจริง ไม่ใช้มุกตลกหรือคำแสลง ' +
-      'เรียบเรียงตามลำดับความสำคัญของข้อมูล เหมาะกับข่าวที่มีความสำคัญหรือละเอียดอ่อน ไม่ใช้อีโมจิ' },
-    { id:'warm', label:'อบอุ่น เป็นเพื่อน', text:
-      'น้ำเสียงอบอุ่น เหมือนเพื่อนสนิทเล่าเรื่องให้ฟัง ใส่ใจความรู้สึกผู้อ่าน ใช้ภาษาน่ารักเป็นกันเอง ' +
-      'ไม่กดดันหรือเร่งรีบ อาจแทรกความเห็นส่วนตัวเบาๆ ได้ ลงท้ายด้วยข้อความให้กำลังใจหรือชวนคุยแบบอบอุ่น' },
-    { id:'snarky', label:'ประชดประชัน ขำขัน', text:
-      'น้ำเสียงประชดประชันแบบขำขัน มีมุมมองส่วนตัวแทรกได้ชัดเจน กล้าแซวหรือติงเรื่องที่ดูแปลกๆ ในข่าวอย่างมีชั้นเชิง ' +
-      'ไม่หยาบคายหรือทำร้ายใคร แค่มองโลกในแง่ขำๆ ใช้ภาษาแบบกันเองสุดๆ' },
-    { id:'breaking', label:'ข่าวด่วน กระชับ', text:
-      'น้ำเสียงข่าวด่วน กระชับ ตรงประเด็น ขึ้นต้นด้วยข้อเท็จจริงสำคัญที่สุดก่อนเสมอ ไม่อ้อมค้อม ' +
-      'ประโยคสั้น อ่านง่าย เหมาะกับคนที่มีเวลาน้อย ไม่ใส่ความเห็นส่วนตัวหรือมุกตลก' },
+    { id:'short', label:'ข่าวสั้น กระชับ', text:
+      'เขียนแบบข่าวสั้นกระชับ ตรงประเด็น ไม่อ้อมค้อม บอกข้อเท็จจริงสำคัญที่สุดก่อนเสมอ ' +
+      'ประโยคสั้น อ่านง่าย ไม่ใส่ความเห็นส่วนตัวหรือมุกตลก เหมาะกับคนที่มีเวลาน้อย' },
+    { id:'drama', label:'ดราม่า ตั้งคำถาม', text:
+      'น้ำเสียงดราม่า ชวนตั้งคำถามกับผู้อ่านตลอดเรื่อง ใช้คำถามเปิดประเด็นให้คนคิดตาม ' +
+      'เน้นความขัดแย้งหรือประเด็นที่ถกเถียงได้ในข่าว สร้างความรู้สึกอยากรู้คำตอบ ' +
+      'ทิ้งท้ายด้วยคำถามชวนให้คนแสดงความคิดเห็น' },
+    { id:'timeline', label:'เล่าตามไทม์ไลน์', text:
+      'เรียบเรียงเนื้อหาตามลำดับเวลาที่เกิดขึ้นจริง ตั้งแต่จุดเริ่มต้นจนถึงสถานการณ์ปัจจุบัน ' +
+      'ใช้คำเชื่อมบอกลำดับเวลาชัดเจน (เช่น แรกเริ่ม, ต่อมา, จนกระทั่ง, ล่าสุด) ' +
+      'ช่วยให้ผู้อ่านเห็นภาพรวมของเหตุการณ์ทั้งหมด' },
+    { id:'casual', label:'เป็นกันเอง สนุกๆ', text:
+      'น้ำเสียงเป็นกันเอง สนุกสนาน เหมือนเพื่อนคุยกัน ใช้ภาษาวัยรุ่นได้ มีมุกตลกแทรกได้บ้าง ' +
+      'ใช้อีโมจิพอประมาณ ลงท้ายด้วยประโยคชวนผู้อ่านคอมเมนต์หรือแชร์ความเห็น' },
   ];
 
   const LAYOUTS = [
@@ -1048,6 +1059,11 @@
       'HEADLINE 2: [หัวข้อทางเลือกที่ 2]\n' +
       'HEADLINE 3: [หัวข้อทางเลือกที่ 3]\n' +
       'HOOK: [ประโยคเปิดบทความ 1-2 ประโยคที่ทำให้คนอยากอ่านต่อ]\n' +
+      'HASHTAGS: [แฮชแท็กสำหรับแปะท้ายโพสต์ ต้องมี #Aniเมาะ เป็นตัวแรกเสมอ\n' +
+      'ตามด้วยแฮชแท็กหมวดข่าว (#' + catMeta(newsItem.category).label.replace(/\s+/g, '') + ')\n' +
+      'และแฮชแท็กชื่อ IP/เรื่อง/ตัวละครหลักที่เกี่ยวข้องกับข่าวนี้โดยตรง\n' +
+      '(เขียนติดกันไม่มีช่องว่างในแต่ละแฮชแท็ก เช่น #JujutsuKaisen ไม่ใช่\n' +
+      '#Jujutsu Kaisen) รวมทั้งหมดประมาณ 4-6 แฮชแท็ก คั่นด้วยช่องว่าง]\n' +
       'ARTICLE: [เนื้อหาบทความ ให้เขียนแค่ 2 ย่อหน้าเท่านั้น ไม่ว่าจะเลือกโทน\n' +
       'ไหนก็ตาม กระชับ อ่านจบไว ไม่ต้องใส่รายละเอียดครบทุกจุดจากสรุปข่าว\n' +
       'เลือกเฉพาะประเด็นที่สำคัญที่สุดมาเขียน เขียนในสไตล์เพจตามที่กำหนด]'
@@ -1064,19 +1080,21 @@
     const h1 = grab('HEADLINE\\s*1', ['HEADLINE\\s*2']);
     const h2 = grab('HEADLINE\\s*2', ['HEADLINE\\s*3']);
     const h3 = grab('HEADLINE\\s*3', ['HOOK']);
-    const hook = grab('HOOK', ['ARTICLE']);
+    const hook = grab('HOOK', ['HASHTAGS']);
+    const hashtags = grab('HASHTAGS', ['ARTICLE']);
     const article = grab('ARTICLE', ['$^']); // ไปจนจบข้อความ
 
     const headlines = [h1, h2, h3].filter(Boolean);
 
     if (headlines.length === 0 && !hook && !article){
       // แยกรูปแบบไม่สำเร็จ — เก็บข้อความทั้งหมดไว้ในช่องบทความแทน ไม่ให้ข้อมูลหาย
-      return { headlines:['(กรุณาระบุหัวข้อเอง)'], hook:'(กรุณาระบุ hook เอง)', article:text.trim() };
+      return { headlines:['(กรุณาระบุหัวข้อเอง)'], hook:'(กรุณาระบุ hook เอง)', hashtags:'#Aniเมาะ', article:text.trim() };
     }
 
     return {
       headlines: headlines.length ? headlines : ['(กรุณาระบุหัวข้อเอง)'],
       hook: hook || '(กรุณาระบุ hook เอง)',
+      hashtags: hashtags || '#Aniเมาะ',
       article: article || text.trim(),
     };
   }
@@ -1103,7 +1121,7 @@
   let searchTerm = '';
   let selectedId = null;
   let styleGuideText = DEFAULT_STYLE_GUIDE;
-  let activeTone = 'casual';
+  let activeTone = 'short';
   let genResult = null;   // { headlines, hook, article }
   let pickedHeadlineIdx = 0;
   let pasteAreaOpen = false;
@@ -1150,6 +1168,9 @@
   function filteredItems(){
     return items
       .filter(function(it){
+        // ซ่อนข่าว "โพสต์แล้ว" ออกจากมุมมอง "ทั้งหมด" เสมอ ต้องกดตัวกรอง
+        // "โพสต์แล้ว" โดยตรงเท่านั้นถึงจะเห็น กันไม่ให้ปนกับข่าวใหม่
+        if (activeStatusFilter === 'all' && it.status === 'posted') return false;
         if (activeCategory !== 'all' && it.category !== activeCategory) return false;
         if (activeStatusFilter !== 'all' && it.status !== activeStatusFilter) return false;
         if (searchTerm){
@@ -1285,9 +1306,11 @@
 
     html += '<div class="ws-selected-card">';
     html += '  <div class="txt">';
-    html += '    <span class="cat-badge" style="color:' + meta.color + '; background:color-mix(in srgb, ' + meta.color + ' 16%, transparent); border:1px solid color-mix(in srgb, ' + meta.color + ' 35%, transparent); margin-bottom:8px;">';
-    html += '      <span class="dot-cat" style="background:' + meta.color + '"></span>' + meta.label;
-    html += '    </span>';
+    html += '    <select id="category-edit-select" class="cat-select" style="color:' + meta.color + '; background:color-mix(in srgb, ' + meta.color + ' 16%, transparent); border:1px solid color-mix(in srgb, ' + meta.color + ' 35%, transparent); margin-bottom:8px;">';
+    Object.entries(CATEGORIES).forEach(function(pair){
+      html += '<option value="' + pair[0] + '"' + (it.category === pair[0] ? ' selected' : '') + '>' + pair[1].label + '</option>';
+    });
+    html += '    </select>';
     html += '    <p class="card-title">' + escapeHtml(it.title) + '</p>';
     html += '    <p class="card-summary">' + escapeHtml(it.summary) + ' — ' + (it.url ? '<a class="src-link" href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener">' + escapeHtml(it.source) + ' ↗</a>' : '<span class="src">' + escapeHtml(it.source) + '</span>') + '</p>';
     html += '  </div>';
@@ -1402,6 +1425,11 @@
       html += '</div>';
 
       html += '<div class="field">';
+      html += '  <div class="field-head"><label>Hashtag</label><button class="copy-btn" id="copy-hashtags">คัดลอก</button></div>';
+      html += '  <input type="text" class="style-input" id="hashtags-input" style="min-height:unset;" value="' + escapeHtml(genResult.hashtags || '#Aniเมาะ') + '">';
+      html += '</div>';
+
+      html += '<div class="field">';
       html += '  <div class="field-head"><label>เนื้อหาบทความ</label><button class="copy-btn" id="copy-article">คัดลอก</button></div>';
       html += '  <textarea class="article-input" id="article-body">' + escapeHtml(genResult.article) + '</textarea>';
       html += '</div>';
@@ -1410,12 +1438,20 @@
       html += '  <button class="btn-secondary" id="btn-redo">🔄 เริ่มใหม่ (วางคำตอบใหม่)</button>';
       html += '  <button class="btn-secondary" id="btn-copy-all">📋 คัดลอกทั้งหมด</button>';
       html += '  <button class="btn-primary-outline" id="btn-mark-drafted">✅ บันทึกสถานะ "เขียนแล้ว"</button>';
+      html += '  <button class="btn-primary-outline" id="btn-mark-posted" style="border-color:var(--accent-game); color:var(--accent-game);">📌 บันทึกสถานะ "โพสต์แล้ว"</button>';
       html += '</div>';
     }
 
     ws.innerHTML = html;
 
     // bind events
+    var categoryEditSelect = document.getElementById('category-edit-select');
+    if (categoryEditSelect) categoryEditSelect.addEventListener('change', function(e){
+      it.category = e.target.value;
+      postToSheet({ action:'update', id: it.id, category: it.category });
+      renderAll();
+    });
+
     var deselectBtn = document.getElementById('btn-deselect');
     if (deselectBtn) deselectBtn.addEventListener('click', function(){ selectedId = null; genResult = null; pasteAreaOpen = false; pastedText = ''; parseError = null; customHeadlineText = null; selectedImageUrls = []; selectedLayout = '1'; renderAll(); });
 
@@ -1707,12 +1743,18 @@
     var copyHookBtn = document.getElementById('copy-hook');
     if (copyHookBtn) copyHookBtn.addEventListener('click', function(){ copyText(genResult.hook, copyHookBtn); });
 
+    var hashtagsInput = document.getElementById('hashtags-input');
+    if (hashtagsInput) hashtagsInput.addEventListener('input', function(e){ genResult.hashtags = e.target.value; });
+
+    var copyHashtagsBtn = document.getElementById('copy-hashtags');
+    if (copyHashtagsBtn) copyHashtagsBtn.addEventListener('click', function(){ copyText(genResult.hashtags, copyHashtagsBtn); });
+
     var copyArticleBtn = document.getElementById('copy-article');
     if (copyArticleBtn) copyArticleBtn.addEventListener('click', function(){ copyText(genResult.article, copyArticleBtn); });
 
     var copyAllBtn = document.getElementById('btn-copy-all');
     if (copyAllBtn) copyAllBtn.addEventListener('click', function(){
-      var full = stripHighlightMarkup(getActiveHeadline()) + String.fromCharCode(10,10) + genResult.hook + String.fromCharCode(10,10) + genResult.article;
+      var full = stripHighlightMarkup(getActiveHeadline()) + String.fromCharCode(10,10) + genResult.hook + String.fromCharCode(10,10) + genResult.article + String.fromCharCode(10,10) + genResult.hashtags;
       copyText(full, copyAllBtn);
     });
 
@@ -1720,6 +1762,14 @@
     if (markBtn) markBtn.addEventListener('click', function(){
       it.status = 'drafted';
       postToSheet({ action:'update', id: it.id, status:'drafted' });
+      renderAll();
+    });
+
+    var markPostedBtn = document.getElementById('btn-mark-posted');
+    if (markPostedBtn) markPostedBtn.addEventListener('click', function(){
+      it.status = 'posted';
+      postToSheet({ action:'update', id: it.id, status:'posted' });
+      selectedId = null; // ปิดแผงเขียนบทความ เพราะข่าวนี้จะหายจากมุมมองหลักแล้ว
       renderAll();
     });
   }
@@ -1733,7 +1783,7 @@
   }
 
   /* ---------- สร้างภาพ Headline Card ด้วย Canvas (พื้นด้านบนโปร่งใส) ---------- */
-  const CATEGORY_HEX = { anime:'#FF5E8A', game:'#3FD9C7', vtuber:'#B18CFF', comic:'#FFC24B' };
+  const CATEGORY_HEX = { anime:'#FF5E8A', game:'#3FD9C7', vtuber:'#B18CFF', comic:'#FFC24B', movie:'#FF7A45', news:'#4DA3FF' };
 
   function roundRect(ctx, x, y, w, h, r){
     ctx.beginPath();
