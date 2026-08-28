@@ -479,16 +479,22 @@
   }
   .img-thumb.none-tile.selected{ border-color:var(--accent-comic); color:var(--accent-comic); }
   .img-thumb.paste-zone{
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:2px;
+    display:block;
     color:var(--text-faint);
     font-size:9.5px;
     text-align:center;
-    padding:6px;
+    padding:26px 6px;
     border-style:dashed;
     cursor:pointer;
-    caret-color:transparent;
+    resize:none;
+    font-family:inherit;
+    line-height:1.4;
+  }
+  .img-thumb.paste-zone::placeholder{ color:var(--text-faint); text-align:center; }
+  .img-thumb.paste-zone:focus{
     outline:none;
+    border-color:var(--accent-vtuber);
+    color:var(--accent-vtuber);
   }
   .img-thumb.paste-zone:focus{
     outline:none;
@@ -1296,12 +1302,13 @@
       html += '</div>';
     });
     html += '<div class="img-thumb none-tile' + (selectedImageUrls.length === 0 ? ' selected' : '') + '" data-img="none">ไม่ใช้รูป<br>(เว้นว่าง)</div>';
-    html += '<div class="img-thumb paste-zone" id="img-paste-zone" contenteditable="true" spellcheck="false" title="คลิกที่นี่แล้วกด Ctrl+V เพื่อวางรูปจากคลิปบอร์ด">📋<br>วางรูป<br>(Ctrl+V)</div>';
+    html += '<textarea class="img-thumb paste-zone" id="img-paste-zone" placeholder="📋 วางรูป (Ctrl+V)" title="คลิกที่นี่แล้วกด Ctrl+V เพื่อวางรูปจากคลิปบอร์ด"></textarea>';
     html += '  </div>';
     html += '  <div style="display:flex; gap:8px;">';
     html += '    <input type="text" id="img-url-input" placeholder="วางลิงก์รูปที่นี่ (https://...)" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; color:var(--text); font-size:13px;">';
     html += '    <button class="btn-secondary" id="btn-add-img" style="white-space:nowrap;">+ เพิ่มรูป</button>';
     html += '    <button class="btn-secondary" id="btn-upload-img" style="white-space:nowrap;">📁 อัปโหลด</button>';
+    html += '    <button class="btn-secondary" id="btn-paste-clipboard" style="white-space:nowrap;">📋 วางจากคลิปบอร์ด</button>';
     html += '    <input type="file" id="img-file-input" accept="image/*" multiple style="display:none;">';
     html += '  </div>';
     html += '  <p style="font-size:10.5px; color:var(--text-faint); margin:6px 0 0; line-height:1.5;">💡 อัปโหลดจากเครื่อง = ไม่ติด CORS แน่นอน แต่ใช้ได้แค่ตอนนี้เท่านั้น (ปิด/รีเฟรชหน้าแล้วหาย ไม่ถูกบันทึกลง Sheet) เหมาะกับตอนที่รูปจากลิงก์ฝังไม่ได้</p>';
@@ -1485,8 +1492,6 @@
 
     var pasteZone = document.getElementById('img-paste-zone');
     if (pasteZone){
-      var pasteZoneDefaultHTML = pasteZone.innerHTML;
-      pasteZone.addEventListener('click', function(){ pasteZone.focus(); });
       pasteZone.addEventListener('paste', function(e){
         e.preventDefault();
         const items = (e.clipboardData || window.clipboardData).items;
@@ -1501,11 +1506,49 @@
             found = true;
           }
         }
-        pasteZone.innerHTML = pasteZoneDefaultHTML; // กันเนื้อหาแทรกเข้าไปในตัว label
+        pasteZone.value = ''; // กันข้อความหลุดเข้ามาค้างในกล่อง
         if (found){
           renderWorkspace(); // ไม่ sync ไป Sheet เพราะเป็น blob URL ใช้ได้แค่เซสชันนี้
         } else {
-          alert('ไม่พบรูปในคลิปบอร์ด — ลองคลิกขวา "Copy image" จากเว็บข่าวมาใหม่ แล้วกด Ctrl+V อีกครั้ง');
+          alert('ไม่พบรูปในคลิปบอร์ด — เช็คก่อนว่า copy รูปมาจริงไหม (ลองวางในแชทหรือ Word ดูว่ามีรูปขึ้นไหม) แล้วลองใหม่ในนี้อีกครั้ง');
+        }
+      });
+    }
+
+    var pasteClipboardBtn = document.getElementById('btn-paste-clipboard');
+    if (pasteClipboardBtn){
+      pasteClipboardBtn.addEventListener('click', async function(){
+        if (!navigator.clipboard || !navigator.clipboard.read){
+          alert('เบราว์เซอร์นี้ไม่รองรับปุ่มนี้ — ใช้วิธีคลิกช่อง "📋 วางรูป" แล้วกด Ctrl+V แทนได้');
+          return;
+        }
+        pasteClipboardBtn.disabled = true;
+        pasteClipboardBtn.textContent = 'กำลังอ่านคลิปบอร์ด...';
+        try {
+          const clipboardItems = await navigator.clipboard.read();
+          const max = parseInt(selectedLayout, 10);
+          let found = false;
+          for (const item of clipboardItems){
+            for (const type of item.types){
+              if (type.indexOf('image') !== -1){
+                const blob = await item.getType(type);
+                const blobUrl = URL.createObjectURL(blob);
+                it.images = (it.images || []).concat([blobUrl]);
+                if (selectedImageUrls.length < max) selectedImageUrls.push(blobUrl);
+                found = true;
+              }
+            }
+          }
+          if (found){
+            renderWorkspace(); // ไม่ sync ไป Sheet เพราะเป็น blob URL ใช้ได้แค่เซสชันนี้
+          } else {
+            alert('ไม่พบรูปในคลิปบอร์ด — ลอง copy รูปจากเว็บข่าวมาก่อน แล้วกดปุ่มนี้อีกครั้ง');
+          }
+        } catch (err){
+          alert('เข้าถึงคลิปบอร์ดไม่ได้: ' + err.message + '\n\nถ้าเบราว์เซอร์ถามสิทธิ์ ให้กด Allow แล้วลองกดปุ่มนี้ใหม่ หรือใช้วิธีคลิกช่อง "📋 วางรูป" แล้วกด Ctrl+V แทน');
+        } finally {
+          pasteClipboardBtn.disabled = false;
+          pasteClipboardBtn.textContent = '📋 วางจากคลิปบอร์ด';
         }
       });
     }
