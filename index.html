@@ -1413,7 +1413,7 @@
 
     var imgGallery = document.getElementById('img-gallery');
     if (imgGallery){
-      imgGallery.querySelectorAll('.img-thumb').forEach(function(thumb){
+      imgGallery.querySelectorAll('.img-thumb:not(.paste-zone)').forEach(function(thumb){
         thumb.addEventListener('click', function(e){
           if (e.target.closest('.img-remove')) return; // อย่าเลือกรูปตอนกดปุ่มลบ
           const key = thumb.dataset.img;
