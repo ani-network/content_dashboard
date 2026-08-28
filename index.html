@@ -486,7 +486,9 @@
     text-align:center;
     padding:6px;
     border-style:dashed;
-    cursor:text;
+    cursor:pointer;
+    caret-color:transparent;
+    outline:none;
   }
   .img-thumb.paste-zone:focus{
     outline:none;
@@ -1294,7 +1296,7 @@
       html += '</div>';
     });
     html += '<div class="img-thumb none-tile' + (selectedImageUrls.length === 0 ? ' selected' : '') + '" data-img="none">ไม่ใช้รูป<br>(เว้นว่าง)</div>';
-    html += '<div class="img-thumb paste-zone" id="img-paste-zone" tabindex="0" title="คลิกที่นี่แล้วกด Ctrl+V เพื่อวางรูปจากคลิปบอร์ด">📋<br>วางรูป<br>(Ctrl+V)</div>';
+    html += '<div class="img-thumb paste-zone" id="img-paste-zone" contenteditable="true" spellcheck="false" title="คลิกที่นี่แล้วกด Ctrl+V เพื่อวางรูปจากคลิปบอร์ด">📋<br>วางรูป<br>(Ctrl+V)</div>';
     html += '  </div>';
     html += '  <div style="display:flex; gap:8px;">';
     html += '    <input type="text" id="img-url-input" placeholder="วางลิงก์รูปที่นี่ (https://...)" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; color:var(--text); font-size:13px;">';
@@ -1483,6 +1485,7 @@
 
     var pasteZone = document.getElementById('img-paste-zone');
     if (pasteZone){
+      var pasteZoneDefaultHTML = pasteZone.innerHTML;
       pasteZone.addEventListener('click', function(){ pasteZone.focus(); });
       pasteZone.addEventListener('paste', function(e){
         e.preventDefault();
@@ -1498,6 +1501,7 @@
             found = true;
           }
         }
+        pasteZone.innerHTML = pasteZoneDefaultHTML; // กันเนื้อหาแทรกเข้าไปในตัว label
         if (found){
           renderWorkspace(); // ไม่ sync ไป Sheet เพราะเป็น blob URL ใช้ได้แค่เซสชันนี้
         } else {
