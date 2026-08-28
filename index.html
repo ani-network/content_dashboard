@@ -719,6 +719,13 @@
     border:1px solid var(--border);
     border-radius:var(--radius);
     width:100%; max-width:440px;
+    max-height:88vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .modal-scroll{
+    overflow-y:auto;
     padding:22px;
   }
   .modal h2{
@@ -737,7 +744,10 @@
     font-size:13.5px;
   }
   .modal-actions{
-    display:flex; gap:8px; justify-content:flex-end; margin-top:18px;
+    display:flex; gap:8px; justify-content:flex-end;
+    padding:14px 22px;
+    border-top:1px solid var(--border);
+    flex:none;
   }
   .btn-primary{
     background:linear-gradient(120deg, var(--accent-anime), var(--accent-vtuber));
@@ -810,52 +820,55 @@
 <!-- Add News Modal -->
 <div class="modal-overlay" id="modal-overlay" hidden>
   <div class="modal">
-    <h2>เพิ่มข่าวใหม่</h2>
+    <div class="modal-scroll">
+      <h2>เพิ่มข่าวใหม่</h2>
 
-    <div class="field">
-      <label for="f-fetch-url">วางลิงก์ข่าว แล้วดึงข้อมูลอัตโนมัติ (ไม่บังคับ)</label>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="f-fetch-url" placeholder="https://...">
-        <button class="btn-accent" id="btn-fetch-meta" style="white-space:nowrap;">ดึงข้อมูล</button>
+      <div class="field">
+        <label for="f-fetch-url">วางลิงก์ข่าว แล้วดึงข้อมูลอัตโนมัติ (ไม่บังคับ)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="f-fetch-url" placeholder="https://...">
+          <button class="btn-accent" id="btn-fetch-meta" style="white-space:nowrap;">ดึงข้อมูล</button>
+        </div>
+        <p id="fetch-meta-status" style="font-size:11.5px; color:var(--text-faint); margin:6px 0 0; display:none;"></p>
       </div>
-      <p id="fetch-meta-status" style="font-size:11.5px; color:var(--text-faint); margin:6px 0 0; display:none;"></p>
-    </div>
 
-    <div class="field">
-      <label for="f-bulk-paste">หรือวางข่าวทั้งก้อน (คัดลอกหัวข้อ+เนื้อหาจากหน้าเว็บมาวางตรงนี้)</label>
-      <textarea id="f-bulk-paste" placeholder="วางข้อความข่าวทั้งหมด บรรทัดแรกจะถูกใช้เป็นหัวข้อ ที่เหลือเป็นเนื้อหา" style="min-height:90px;"></textarea>
-      <button class="btn-secondary" id="btn-parse-bulk" style="margin-top:8px; width:100%;">✂️ แยกข้อมูล</button>
-    </div>
+      <div class="field">
+        <label for="f-bulk-paste">หรือวางข่าวทั้งก้อน (คัดลอกหัวข้อ+เนื้อหาจากหน้าเว็บมาวางตรงนี้)</label>
+        <textarea id="f-bulk-paste" placeholder="วางข้อความข่าวทั้งหมด บรรทัดแรกจะถูกใช้เป็นหัวข้อ ที่เหลือเป็นเนื้อหา" style="min-height:90px;"></textarea>
+        <button class="btn-secondary" id="btn-parse-bulk" style="margin-top:8px; width:100%;">✂️ แยกข้อมูล</button>
+      </div>
 
-    <div class="field">
-      <label for="f-title">หัวข้อข่าว</label>
-      <input type="text" id="f-title" placeholder="เช่น ประกาศซีซั่นใหม่ของ...">
-    </div>
-    <div class="field">
-      <label for="f-category">หมวดหมู่</label>
-      <select id="f-category">
-        <option value="anime">Anime</option>
-        <option value="game">Game</option>
-        <option value="vtuber">VTuber</option>
-        <option value="comic">Manga</option>
-      </select>
-    </div>
-    <div class="field">
-      <label for="f-summary">สรุปสั้นๆ</label>
-      <textarea id="f-summary" placeholder="สรุป 1-2 บรรทัด"></textarea>
-    </div>
-    <div class="field">
-      <label for="f-source">แหล่งที่มา</label>
-      <input type="text" id="f-source" placeholder="เช่น Anime News Network">
-    </div>
-    <div class="field">
-      <label for="f-url">ลิงก์ข่าวต้นทาง (ถ้ามี)</label>
-      <input type="text" id="f-url" placeholder="https://...">
+      <div class="field">
+        <label for="f-title">หัวข้อข่าว</label>
+        <input type="text" id="f-title" placeholder="เช่น ประกาศซีซั่นใหม่ของ...">
+      </div>
+      <div class="field">
+        <label for="f-category">หมวดหมู่</label>
+        <select id="f-category">
+          <option value="anime">Anime</option>
+          <option value="game">Game</option>
+          <option value="vtuber">VTuber</option>
+          <option value="comic">Manga</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-summary">สรุปสั้นๆ</label>
+        <textarea id="f-summary" placeholder="สรุป 1-2 บรรทัด"></textarea>
+      </div>
+      <div class="field">
+        <label for="f-source">แหล่งที่มา</label>
+        <input type="text" id="f-source" placeholder="เช่น Anime News Network">
+      </div>
+      <div class="field">
+        <label for="f-url">ลิงก์ข่าวต้นทาง (ถ้ามี)</label>
+        <input type="text" id="f-url" placeholder="https://...">
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" id="btn-cancel">ยกเลิก</button>
       <button class="btn-primary" id="btn-save">บันทึก</button>
     </div>
+
   </div>
 </div>
 
